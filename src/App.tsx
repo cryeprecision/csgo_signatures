@@ -1,12 +1,12 @@
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import { Chip, createTheme, CssBaseline, Divider, Paper, Stack, ThemeProvider } from '@mui/material'
-import { Box, TextField, Typography } from '@mui/material'
+import { memo, useEffect, useMemo, useState } from 'react'
+import { createTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import Grid from '@mui/material/Unstable_Grid2'
 import styled from '@emotion/styled'
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
-import AutoSizer, { Size } from 'react-virtualized-auto-sizer'
+import { FetchCallback, RawResourceMap, Resource, ResourceMap, Signature } from './types/types'
+
+import { AppBar } from './components/AppBar'
+import { SignatureCollection } from './components/SignatureCollection'
 
 const theme = createTheme({
   palette: {
@@ -15,38 +15,6 @@ const theme = createTheme({
 })
 
 const urlPrefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
-
-type Resource = {
-  name: string
-  urlSuffix: string
-}
-
-type FetchCallback = (name: string, index: number) => void
-
-type Signature = {
-  name: string
-  sig: string
-  source?: string
-  vTableIdx?: number
-}
-
-const columns: GridColDef[] = [
-  {
-    field: 'name',
-    headerName: 'Name',
-    sortable: false,
-    flex: 1,
-  },
-  {
-    field: 'sig',
-    headerName: 'Signature',
-    sortable: false,
-    flex: 3,
-  },
-]
-
-type RawResourceMap = { [key: string]: string }
-type ResourceMap = { [key: string]: Signature[] }
 
 const resources: Resource[] = [
   { name: 'client', urlSuffix: 'client_funcs.c' },
@@ -58,13 +26,13 @@ const resources: Resource[] = [
 ]
 
 const parseLine = (line: string): Signature | null => {
-  const splits = line.split('=')
+  const splits = line.replace('\r', '').split('=')
   if (splits.length < 2) return null
   return {
     name: splits[0],
     sig: splits[1],
     source: splits.length < 3 ? undefined : splits[2],
-    vTableIdx: splits.length < 4 ? undefined : parseInt(splits[3]),
+    classInfo: splits.length < 5 ? undefined : { name: splits[3], vTableIndex: parseInt(splits[4]) },
   }
 }
 
@@ -104,7 +72,12 @@ const countSignatures = (map: ResourceMap): number => {
 }
 
 const matchesSearch = (sig: Signature, search: string): boolean => {
-  return sig.name.includes(search) || sig.sig.includes(search)
+  return (
+    sig.name.includes(search) ||
+    sig.sig.includes(search) ||
+    (sig.source !== undefined && sig.source.includes(search)) ||
+    (sig.classInfo !== undefined && (sig.classInfo.name.includes(search) || sig.classInfo.vTableIndex.toString().includes(search)))
+  )
 }
 
 const StyledDataGrid = styled(DataGrid)(({ theme: Theme }) => ({
@@ -112,32 +85,6 @@ const StyledDataGrid = styled(DataGrid)(({ theme: Theme }) => ({
     display: 'none',
   },
 }))
-
-const SignatureItem = (sig: Signature): JSX.Element => {
-  return (
-    <Paper elevation={2} sx={{ mb: 1, p: 2 }}>
-      <Typography fontFamily='Roboto Mono' align='left'>
-        {sig.name}
-      </Typography>
-      <Divider sx={{ my: 1 }} />
-      <Typography fontFamily='Roboto Mono' align='left' fontSize={10}>
-        {sig.sig.length < 25 ? sig.sig : sig.sig.substring(0, 40).trimEnd() + '...'}
-      </Typography>
-    </Paper>
-  )
-}
-
-const FileItem = ([name, sigs]: [string, Signature[]]): JSX.Element | undefined => {
-  if (sigs.length === 0) return undefined
-  return (
-    <Grid xs={12} md={6} xl={4}>
-      <Paper sx={{ p: 1 }}>
-        <Chip variant='outlined' sx={{ p: 1, mb: 1 }} label={name} />
-        <Stack>{sigs.map(SignatureItem)}</Stack>
-      </Paper>
-    </Grid>
-  )
-}
 
 export const App = () => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -198,67 +145,18 @@ export const App = () => {
     if (parsedData === null) return 0
     return countSignatures(parsedData)
   }, [parsedData])
+  const signaturesMatched = useMemo((): number => {
+    if (filtered === null) return 0
+    return countSignatures(filtered)
+  }, [filtered])
 
   const appState = loading ? 'Loading' : error ? 'Error: ' + error.message : data ? 'Done' : 'Undefined'
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <Box>
-        <Typography variant='h1'>CS:GO Signatures</Typography>
-        <Typography variant='h4'>App State: {appState}</Typography>
-        <Typography variant='h4'>Loaded {signaturesLoaded} Signatures</Typography>
-        <Typography variant='h4'>Fetched: {fetched.join(', ')}</Typography>
-        <TextField onChange={({ target }) => setSearch(target.value)} id='outlined-basic' label='Search Signatures' variant='outlined' />
-
-        {filtered !== null && filteredLimited !== null && (
-          <>
-            <Typography variant='h2'>Matches: {countSignatures(filtered)}</Typography>
-            <Grid container spacing={1}>
-              {Object.entries(filteredLimited).map(FileItem)}
-            </Grid>
-          </>
-        )}
-      </Box>
+      <AppBar appState={appState} sigsLoaded={signaturesLoaded} sigsMatched={signaturesMatched} setSearch={setSearch} />
+      {filtered && <SignatureCollection sigs={filtered} />}
     </ThemeProvider>
   )
 }
-
-// const SignatureItem = ({ index, style }: ListChildComponentProps): JSX.Element => {
-//     if (filteredFlat === null) return <></>
-//     return (
-//       <Paper elevation={2} style={style} sx={{ m: 2, p: 2 }}>
-//         <Typography variant='body1'>{filteredFlat[index].name}</Typography>
-//         <Typography variant='body2'>{filteredFlat[index].sig}</Typography>
-//       </Paper>
-//     )
-//   }
-// <AutoSizer>
-// {({ width, height }: Size) => (
-//   <List width={width} height={height} itemCount={filteredFlat.length} itemSize={60}>
-//     {SignatureItem}
-//   </List>
-// )}
-// </AutoSizer>
-
-// <Grid container spacing={2}>
-// {Object.entries(filtered).map(([name, signatures]) => {
-//   return (
-//     <Grid xs={6} key={name}>
-//       <Paper>
-//         <StyledDataGrid
-//           autoHeight={true}
-//           rows={signatures}
-//           pageSize={10}
-//           rowsPerPageOptions={[10]}
-//           getRowId={row => row.name}
-//           columns={columns}
-//           disableSelectionOnClick
-//           disableColumnMenu
-//           density='compact'
-//         />
-//       </Paper>
-//     </Grid>
-//   )
-// })}
-// </Grid>
