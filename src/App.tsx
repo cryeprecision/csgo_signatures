@@ -3,7 +3,7 @@ import { memo, useEffect, useMemo, useState } from 'react'
 import { createTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import styled from '@emotion/styled'
-import { FetchCallback, RawResourceMap, Resource, Signature } from './types/types'
+import { ClassInfo, FetchCallback, RawResourceMap, Resource, Signature } from './types/types'
 
 import { AppBar } from './components/AppBar'
 import { SignatureCollection } from './components/SignatureCollection'
@@ -15,7 +15,8 @@ const theme = createTheme({
 })
 
 const urlPrefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
-// const urlPrefix = './'
+// const urlPrefix = './real_resources/'
+// const urlPrefix = './test_resources/'
 
 const resources: Resource[] = [
   { name: 'client', urlSuffix: 'client_funcs.c' },
@@ -26,16 +27,42 @@ const resources: Resource[] = [
   { name: 'panoramauiclient', urlSuffix: 'panoramauiclient_funcs.c' },
 ]
 
+// `void test<pair<string, int>>()` => `void test<[...]>()`
+// `pair<string, int> test<pair<string, int>>()` => `pair<[...]> test<[...]>()`
+const omitTemplates = (name: string): string => {
+  return name
+}
+
+const parseClassInfo = (name: string, vTableIndex: string): ClassInfo => {
+  const first = name.indexOf('<')
+  const last = name.lastIndexOf('>')
+  if (first !== -1 && last !== -1 && first < last) {
+    name = name.substring(0, first + 1) + '[...]' + name.substring(last)
+  }
+  return { name: name, vTableIndex: parseInt(vTableIndex) }
+}
+
+const parseSigName = (name: string): string => {
+  // remove `virtual` because its usage is inconsistens and virtual functions can be recognized by the `ClassInfo`
+  if (name.startsWith('virtual ')) name = name.substring(8)
+
+  // remove templates that are just wrong
+  const start = name.indexOf('<')
+  if (start !== -1 && name.indexOf('>') === -1) name = name.substring(0, start)
+
+  return name
+}
+
 const parseLine = (fileName: string, line: string, lineNr: number): Signature | null => {
   const splits = line.replace('\r', '').split('=')
   if (splits.length < 2) return null
   return {
     fileName: fileName,
     lineNr: lineNr,
-    sigName: splits[0],
+    sigName: parseSigName(splits[0]),
     sig: splits[1],
     source: splits.length < 3 ? undefined : splits[2],
-    classInfo: splits.length < 5 ? undefined : { name: splits[3], vTableIndex: parseInt(splits[4]) },
+    classInfo: splits.length < 5 ? undefined : parseClassInfo(splits[3], splits[4]),
   }
 }
 
@@ -85,23 +112,17 @@ const matchesSearch = (sig: Signature, search: string): boolean => {
 export const App = () => {
   const [rawData, setRawData] = useState<RawResourceMap>()
   const [error, setError] = useState<Error>()
-
   const [loading, setLoading] = useState<boolean>(false)
-  const [fetched, setFetched] = useState<string[]>([])
-
   const [search, setSearch] = useState<string>('')
 
   useEffect(() => {
     const controller = new AbortController()
 
     setLoading(true)
-    setFetched([])
     setError(undefined)
     setRawData(undefined)
 
-    fetchAllResources(controller.signal, (name, _index) => {
-      setFetched(current => [...current, name])
-    })
+    fetchAllResources(controller.signal)
       .then(fetched => {
         setRawData(fetched)
         setError(undefined)
