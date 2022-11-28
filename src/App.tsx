@@ -15,6 +15,7 @@ const theme = createTheme({
 })
 
 const urlPrefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
+// const urlPrefix = './'
 
 const resources: Resource[] = [
   { name: 'client', urlSuffix: 'client_funcs.c' },
