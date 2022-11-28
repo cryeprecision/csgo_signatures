@@ -1,7 +1,7 @@
 # csgo_signatures
 
 An alternative to [kittenpopo.github.io/csgo-offsets](https://kittenpopo.github.io/csgo-offsets/), this uses the same underlying data
-but is faster and more responsive.
+but is more responsive.
 
 - [KittenPopo/csgo-offsets/site/rawsigdata/client_funcs.c](https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/client_funcs.c)
 - [KittenPopo/csgo-offsets/site/rawsigdata/engine_funcs.c](https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/engine_funcs.c)
