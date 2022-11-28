@@ -1,30 +1,15 @@
 import { Theme } from '@emotion/react'
-import {
-  Box,
-  Chip as Chip_,
-  Collapse,
-  Divider,
-  IconButton,
-  MenuItem,
-  Pagination,
-  Paper,
-  Select,
-  Stack,
-  SxProps,
-  Typography,
-} from '@mui/material'
+import { Box, Collapse, IconButton, MenuItem, Pagination, Paper, Select, Stack, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import { memo, useEffect, useMemo, useState } from 'react'
-import { FileSignature, ResourceMap, Signature, toFileSignatures } from '../types/types'
+import { Signature } from '../types/types'
 import { ExpandMore, ExpandLess } from '@mui/icons-material'
-type ChipProps = {
-  label: string
-}
+import * as Sig from './Signature'
 
 type SetOpen = React.Dispatch<React.SetStateAction<boolean[]>>
 
 type SignatureItemProps = {
-  sig: FileSignature
+  sig: Signature
   open: boolean[]
   setOpen: SetOpen
   index: number
@@ -36,7 +21,7 @@ const SignatureItem = ({ sig, open, setOpen, index }: SignatureItemProps): JSX.E
       <Box display='flex' alignItems='center'>
         <IconButton
           size='large'
-          sx={{ mr: 2 }}
+          sx={{ mr: 2, alignSelf: 'start' }}
           onClick={() => {
             setOpen(prev => prev.map((prev_, index_) => (index_ === index ? !prev_ : prev_)))
           }}
@@ -44,37 +29,24 @@ const SignatureItem = ({ sig, open, setOpen, index }: SignatureItemProps): JSX.E
           {open[index] ? <ExpandLess /> : <ExpandMore />}
         </IconButton>
         <Box>
-          <Typography fontFamily='Roboto Mono' align='left'>
-            {sig.name}
-          </Typography>
+          <Sig.MySignatureName sig={sig} />
+          <Collapse in={open[index]} unmountOnExit>
+            <Box sx={{ mt: 2 }}>
+              <Sig.MySignatureName sig={sig} />
+              <Sig.MySignature sig={sig} />
+              <Sig.MyClassInfo sig={sig} />
+              <Sig.MySource sig={sig} />
+            </Box>
+          </Collapse>
         </Box>
       </Box>
-      <Collapse in={open[index]} unmountOnExit>
-        <Box sx={{ mt: 2 }}>
-          <Typography fontFamily='Roboto Mono' noWrap>
-            {`${sig.file}.dll -> ${sig.sig}`}
-          </Typography>
-          {sig.classInfo && (
-            <Typography fontFamily='Roboto Mono' noWrap>
-              {`${sig.classInfo.name}[${sig.classInfo.vTableIndex}]`}
-            </Typography>
-          )}
-          <Typography fontFamily='Roboto Mono' noWrap>
-            {`${sig.source}`}
-          </Typography>
-        </Box>
-      </Collapse>
     </Paper>
   )
 }
 
-export type SignatureCollectionProps = {
-  sigs: ResourceMap
-}
-
 const pageSizes: number[] = [5, 10, 25, 50, 100]
 
-const ActualCollection = ({ sigs, open, setOpen }: { sigs: FileSignature[]; open: boolean[]; setOpen: SetOpen }): JSX.Element => {
+const ActualCollection = ({ sigs, open, setOpen }: { sigs: Signature[]; open: boolean[]; setOpen: SetOpen }): JSX.Element => {
   return (
     <Stack sx={{ mb: 2 }}>
       {sigs.map((sig, index) => (
@@ -84,15 +56,16 @@ const ActualCollection = ({ sigs, open, setOpen }: { sigs: FileSignature[]; open
   )
 }
 
-export const SignatureCollection = ({ sigs }: SignatureCollectionProps): JSX.Element => {
-  const flatSigs = useMemo((): FileSignature[] => toFileSignatures(sigs), [sigs])
+export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
+
   const [start, end] = useMemo((): [number, number] => {
-    const page_ = Math.min(page, Math.floor((flatSigs.length + pageSize) / pageSize))
+    const page_ = Math.min(page, Math.floor((sigs.length + pageSize) / pageSize))
     return [(page_ - 1) * pageSize, page_ * pageSize]
-  }, [pageSize, page, flatSigs])
-  const actualSigs = useMemo((): FileSignature[] => flatSigs.slice(start, end), [flatSigs, start, end])
+  }, [pageSize, page, sigs])
+
+  const actualSigs = useMemo((): Signature[] => sigs.slice(start, end), [sigs, start, end])
   const [open, setOpen] = useState<boolean[]>(Array(pageSize).fill(false))
 
   useEffect(() => {
@@ -106,7 +79,7 @@ export const SignatureCollection = ({ sigs }: SignatureCollectionProps): JSX.Ele
           <Box sx={{ p: 1 }}>
             <Pagination
               size='large'
-              count={Math.floor((flatSigs.length + pageSize) / pageSize)}
+              count={Math.floor((sigs.length + pageSize) / pageSize)}
               showFirstButton
               showLastButton
               onChange={(_event, page) => setPage(page)}

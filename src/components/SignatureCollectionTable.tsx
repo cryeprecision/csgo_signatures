@@ -1,9 +1,10 @@
 import { Theme } from '@emotion/react'
+import styled from '@emotion/styled'
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip as Chip_, Paper, Stack, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { memo, useMemo } from 'react'
-import { ResourceMap, Signature, ClassInfo } from '../types/types'
+import { Signature, ClassInfo } from '../types/types'
 
 type DataSignature = {
   file: string
@@ -13,6 +14,12 @@ type DataSignature = {
   className: string
   vTableIndex: string
 }
+
+const StyledDataGrid = styled(DataGrid)(({ theme: Theme }) => ({
+  '& .MuiDataGrid-iconSeparator': {
+    display: 'none',
+  },
+}))
 
 const columns: GridColDef[] = [
   {
@@ -59,21 +66,15 @@ const columns: GridColDef[] = [
   },
 ]
 
-const buildData = (map: ResourceMap): DataSignature[] => {
-  let buffer: DataSignature[] = []
-  for (const [name, sigs] of Object.entries(map)) {
-    buffer.push(
-      ...sigs.map(sig => ({
-        file: name,
-        name: sig.name,
-        sig: sig.sig,
-        source: sig.source ?? '',
-        className: sig.classInfo ? sig.classInfo.name : '',
-        vTableIndex: sig.classInfo ? sig.classInfo.vTableIndex.toString() : '',
-      })),
-    )
-  }
-  return buffer
+const buildData = (sigs: Signature[]): DataSignature[] => {
+  return sigs.map(sig => ({
+    file: sig.fileName,
+    name: sig.sigName,
+    sig: sig.sig,
+    source: sig.source ?? '',
+    className: sig.classInfo ? sig.classInfo.name : '',
+    vTableIndex: sig.classInfo ? sig.classInfo.vTableIndex.toString() : '',
+  }))
 }
 
 const getId = (sig: DataSignature): string => sig.file + sig.name
@@ -87,7 +88,7 @@ const SignatureItem_ = ({ sig, file }: SignatureItemProps): JSX.Element => {
   return (
     <Accordion>
       <AccordionSummary>
-        <Typography fontFamily='Roboto Mono'>{sig.name}</Typography>
+        <Typography fontFamily='Roboto Mono'>{sig.sigName}</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Box>
@@ -104,14 +105,10 @@ const SignatureItem_ = ({ sig, file }: SignatureItemProps): JSX.Element => {
 
 const SignatureItem = memo(SignatureItem_)
 
-export type SignatureCollectionProps = {
-  sigs: ResourceMap
-}
-
-const SignatureCollection_ = ({ sigs }: SignatureCollectionProps): JSX.Element => {
+const SignatureCollection_ = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   const dataSigs = useMemo((): DataSignature[] => buildData(sigs), [sigs])
   return (
-    <Paper elevation={2} sx={{ height: '80vh' }}>
+    <Paper elevation={2} sx={{ height: '60vh', m: 2 }}>
       <DataGrid columns={columns} rows={dataSigs} getRowId={getId} />
     </Paper>
   )

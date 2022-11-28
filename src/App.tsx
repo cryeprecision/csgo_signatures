@@ -3,7 +3,7 @@ import { memo, useEffect, useMemo, useState } from 'react'
 import { createTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import styled from '@emotion/styled'
-import { FetchCallback, RawResourceMap, Resource, ResourceMap, Signature } from './types/types'
+import { FetchCallback, RawResourceMap, Resource, Signature } from './types/types'
 
 import { AppBar } from './components/AppBar'
 import { SignatureCollection } from './components/SignatureCollection'
@@ -26,21 +26,23 @@ const resources: Resource[] = [
   { name: 'panoramauiclient', urlSuffix: 'panoramauiclient_funcs.c' },
 ]
 
-const parseLine = (line: string): Signature | null => {
+const parseLine = (fileName: string, line: string, lineNr: number): Signature | null => {
   const splits = line.replace('\r', '').split('=')
   if (splits.length < 2) return null
   return {
-    name: splits[0],
+    fileName: fileName,
+    lineNr: lineNr,
+    sigName: splits[0],
     sig: splits[1],
     source: splits.length < 3 ? undefined : splits[2],
     classInfo: splits.length < 5 ? undefined : { name: splits[3], vTableIndex: parseInt(splits[4]) },
   }
 }
 
-const parseFile = (file: string): Signature[] => {
+const parseFile = (fileName: string, file: string): Signature[] => {
   let signatures: Signature[] = []
-  file.split('\n').forEach(line => {
-    const parsed = parseLine(line)
+  file.split('\n').forEach((line, index) => {
+    const parsed = parseLine(fileName, line, index)
     if (parsed !== null) signatures.push(parsed)
   })
   return signatures
@@ -68,30 +70,23 @@ const fetchAllResources = async (signal: AbortSignal, callback?: FetchCallback):
   return data
 }
 
-const countSignatures = (map: ResourceMap): number => {
-  return Object.values(map).reduce((acc, next): number => acc + next.length, 0)
-}
-
 const matchesSearch = (sig: Signature, search: string): boolean => {
   return (
-    sig.name.includes(search) ||
+    sig.sigName.includes(search) ||
     sig.sig.includes(search) ||
+    sig.fileName.includes(search) ||
     (sig.source !== undefined && sig.source.includes(search)) ||
     (sig.classInfo !== undefined && (sig.classInfo.name.includes(search) || sig.classInfo.vTableIndex.toString().includes(search)))
   )
 }
 
-const StyledDataGrid = styled(DataGrid)(({ theme: Theme }) => ({
-  '& .MuiDataGrid-iconSeparator': {
-    display: 'none',
-  },
-}))
-
 export const App = () => {
+  const [rawData, setRawData] = useState<RawResourceMap>()
+  const [error, setError] = useState<Error>()
+
   const [loading, setLoading] = useState<boolean>(false)
   const [fetched, setFetched] = useState<string[]>([])
-  const [data, setData] = useState<RawResourceMap>()
-  const [error, setError] = useState<Error>()
+
   const [search, setSearch] = useState<string>('')
 
   useEffect(() => {
@@ -100,13 +95,13 @@ export const App = () => {
     setLoading(true)
     setFetched([])
     setError(undefined)
-    setData(undefined)
+    setRawData(undefined)
 
     fetchAllResources(controller.signal, (name, _index) => {
       setFetched(current => [...current, name])
     })
       .then(fetched => {
-        setData(fetched)
+        setRawData(fetched)
         setError(undefined)
       })
       .catch(error => setError(error))
@@ -115,48 +110,25 @@ export const App = () => {
     return () => controller.abort()
   }, [])
 
-  const parsedData = useMemo((): ResourceMap | null => {
-    if (data === undefined) return null
-    let parsed: ResourceMap = {}
-    for (const name of Object.keys(data)) {
-      parsed[name] = parseFile(data[name])
+  const parsedData = useMemo((): Signature[] => {
+    if (rawData === undefined) return []
+    let buffer: Signature[] = []
+    for (const name of Object.keys(rawData)) {
+      buffer.push(...parseFile(name, rawData[name]))
     }
-    return parsed
-  }, [data])
+    return buffer
+  }, [rawData])
 
-  const filtered = useMemo((): ResourceMap | null => {
-    if (parsedData === null) return null
-    let filtered_: ResourceMap = {}
-    for (const [name, signatures] of Object.entries(parsedData)) {
-      filtered_[name] = signatures.filter(signature => matchesSearch(signature, search))
-    }
-    return filtered_
+  const filtered = useMemo((): Signature[] => {
+    return parsedData.filter(sig => matchesSearch(sig, search))
   }, [parsedData, search])
 
-  const filteredLimited = useMemo((): ResourceMap | null => {
-    if (filtered === null) return null
-    let filtered_: ResourceMap = {}
-    for (const [name, signatures] of Object.entries(filtered)) {
-      filtered_[name] = signatures.slice(0, 10)
-    }
-    return filtered_
-  }, [filtered])
-
-  const signaturesLoaded = useMemo((): number => {
-    if (parsedData === null) return 0
-    return countSignatures(parsedData)
-  }, [parsedData])
-  const signaturesMatched = useMemo((): number => {
-    if (filtered === null) return 0
-    return countSignatures(filtered)
-  }, [filtered])
-
-  const appState = loading ? 'Loading' : error ? 'Error: ' + error.message : data ? 'Done' : 'Undefined'
+  const appState = loading ? 'Loading' : error ? 'Error: ' + error.message : rawData ? 'Done' : 'Undefined'
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <AppBar appState={appState} sigsLoaded={signaturesLoaded} sigsMatched={signaturesMatched} setSearch={setSearch} />
+      <AppBar appState={appState} sigsLoaded={parsedData.length} sigsMatched={filtered.length} setSearch={setSearch} />
       {filtered && <SignatureCollection sigs={filtered} />}
     </ThemeProvider>
   )
