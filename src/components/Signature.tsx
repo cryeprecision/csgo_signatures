@@ -1,69 +1,93 @@
-import { Theme } from '@emotion/react'
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  MenuItem,
-  Pagination,
-  Paper,
-  Select,
-  Stack,
-  styled,
-  Typography,
-} from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2'
-import { memo, useMemo, useState } from 'react'
+import { styled, SxProps, TextField, Theme, Tooltip, Typography } from '@mui/material'
 import { Signature } from '../types/types'
-import { paging } from '../utility/paging'
+
+const baseSx: SxProps<Theme> = {
+  borderRadius: 1,
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+  p: 1,
+}
+const nameSx: SxProps<Theme> = {
+  ...baseSx,
+  maxWidth: '70%',
+  textOverflow: 'ellipsis',
+}
+const sigSx: SxProps<Theme> = {
+  ...baseSx,
+  maxWidth: '70%',
+  textOverflow: 'ellipsis',
+  color: theme => theme.palette.info[theme.palette.mode],
+}
+const fileNameSx: SxProps<Theme> = {
+  ...baseSx,
+  color: theme => theme.palette.error[theme.palette.mode],
+}
+const classInfoSx: SxProps<Theme> = {
+  ...baseSx,
+  maxWidth: '70%',
+  textOverflow: 'ellipsis',
+  color: theme => theme.palette.warning[theme.palette.mode],
+}
+const sourceSx: SxProps<Theme> = {
+  ...baseSx,
+  color: theme => theme.palette.success[theme.palette.mode],
+}
+
+const MyTypography = ({ sx, title }: { sx: SxProps<Theme>; title: string }): JSX.Element => {
+  return (
+    <Typography noWrap fontFamily='Roboto Mono' sx={sx}>
+      {title}
+    </Typography>
+  )
+}
+
+const MyTextField = ({ title }: { sx: SxProps<Theme>; title: string }): JSX.Element => {
+  return <TextField variant='outlined' size='small' value={title} inputMode='none' disabled />
+}
+
+const MyTooltip = ({ title, children }: { title: string; children: JSX.Element }): JSX.Element | null => {
+  return children // disable tooltip for now
+  return <Tooltip title={<Typography fontFamily='Roboto Mono'>{title}</Typography>}>{children}</Tooltip>
+}
 
 export const MySignatureName = ({ sig }: { sig: Signature }): JSX.Element => {
+  const text = sig.sigName
   return (
-    <Typography
-      fontFamily='Roboto Mono'
-      sx={{ color: theme => theme.palette.info.dark, backgroundColor: theme => theme.palette.background.paper }}
-    >
-      {sig.sigName}
-    </Typography>
+    <MyTooltip title={text}>
+      <MyTypography sx={nameSx} title={text} />
+    </MyTooltip>
   )
 }
 export const MySignature = ({ sig }: { sig: Signature }): JSX.Element => {
+  const text = sig.sig
   return (
-    <Typography
-      fontFamily='Roboto Mono'
-      sx={{ color: theme => theme.palette.info.dark, backgroundColor: theme => theme.palette.background.paper }}
-    >
-      {sig.sig}
-    </Typography>
+    <MyTooltip title={text}>
+      <MyTypography sx={sigSx} title={text} />
+    </MyTooltip>
   )
 }
 export const MyFileName = ({ sig }: { sig: Signature }): JSX.Element => {
+  const text = sig.fileName + '.dll'
   return (
-    <Typography
-      fontFamily='Roboto Mono'
-      sx={{ color: theme => theme.palette.error.dark, backgroundColor: theme => theme.palette.background.paper }}
-    >
-      {sig.fileName + '.dll'}
-    </Typography>
+    <MyTooltip title={text}>
+      <MyTypography sx={fileNameSx} title={text} />
+    </MyTooltip>
   )
 }
 export const MyClassInfo = ({ sig }: { sig: Signature }): JSX.Element | null => {
   if (sig.classInfo === undefined) return null
+  const text = `${sig.classInfo.name}[${sig.classInfo.vTableIndex}]`
   return (
-    <Typography
-      fontFamily='Roboto Mono'
-      sx={{ color: theme => theme.palette.warning.dark, backgroundColor: theme => theme.palette.background.paper }}
-    >{`${sig.classInfo.name}[${sig.classInfo.vTableIndex}]`}</Typography>
+    <MyTooltip title={text}>
+      <MyTypography sx={classInfoSx} title={text} />
+    </MyTooltip>
   )
 }
 export const MySource = ({ sig }: { sig: Signature }): JSX.Element | null => {
   if (sig.source === undefined) return null
+  const text = sig.source
   return (
-    <Typography
-      fontFamily='Roboto Mono'
-      sx={{ color: theme => theme.palette.success.dark, backgroundColor: theme => theme.palette.background.paper }}
-    >
-      {sig.source}
-    </Typography>
+    <MyTooltip title={text}>
+      <MyTypography sx={sourceSx} title={text} />
+    </MyTooltip>
   )
 }
