@@ -16,7 +16,7 @@ const Chip = ({ sx, label }: { sx?: SxProps<Theme>; label?: React.ReactNode }): 
 
 export const AppBar = ({ appState, sigsLoaded, sigsMatched, setSearch }: AppBarProps): JSX.Element => {
   return (
-    <AppBar_ position='sticky' sx={{ mb: 2 }}>
+    <AppBar_ position='sticky' sx={{ mb: 1 }}>
       <Toolbar>
         <IconButton size='large' edge='start' sx={{ mr: 2 }}>
           <Menu />
