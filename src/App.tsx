@@ -7,6 +7,7 @@ import { ClassInfo, FetchCallback, RawResourceMap, Resource, Signature } from '.
 
 import { AppBar } from './components/AppBar'
 import { SignatureCollection } from './components/SignatureCollection'
+import { BracketPair, omitBrackets } from './utility/omit_templates'
 
 const theme = createTheme({
   palette: {
@@ -27,30 +28,33 @@ const resources: Resource[] = [
   { name: 'panoramauiclient', urlSuffix: 'panoramauiclient_funcs.c' },
 ]
 
-// `void test<pair<string, int>>()` => `void test<[...]>()`
-// `pair<string, int> test<pair<string, int>>()` => `pair<[...]> test<[...]>()`
-const omitTemplates = (name: string): string => {
-  return name
+const omitBrackets_ = (text: string): string | null => omitBrackets(text, ['<', '>'], 1, '[...]', 10)
+
+const compactClassName = (name: string): string | undefined => {
+  let omitted: string = name
+
+  omitted = omitBrackets_(name) ?? 'INVALID'
+
+  return omitted === name ? undefined : omitted
 }
 
 const parseClassInfo = (name: string, vTableIndex: string): ClassInfo => {
-  const first = name.indexOf('<')
-  const last = name.lastIndexOf('>')
-  if (first !== -1 && last !== -1 && first < last) {
-    name = name.substring(0, first + 1) + '[...]' + name.substring(last)
-  }
-  return { name: name, vTableIndex: parseInt(vTableIndex) }
+  return { name: name, nameCompact: compactClassName(name), vTableIndex: parseInt(vTableIndex) }
 }
 
-const parseSigName = (name: string): string => {
-  // remove `virtual` because its usage is inconsistens and virtual functions can be recognized by the `ClassInfo`
-  if (name.startsWith('virtual ')) name = name.substring(8)
+const compactSigName = (name: string): string | undefined => {
+  let omitted: string = name
+
+  // remove `virtual ` prefix
+  if (omitted.startsWith('virtual ')) omitted = omitted.substring(8)
 
   // remove templates that are just wrong
-  const start = name.indexOf('<')
-  if (start !== -1 && name.indexOf('>') === -1) name = name.substring(0, start)
+  const start = omitted.indexOf('<')
+  if (start !== -1 && omitted.indexOf('>') === -1) omitted = omitted.substring(0, start)
 
-  return name
+  omitted = omitBrackets_(omitted) ?? 'INVALID'
+
+  return omitted === name ? undefined : omitted
 }
 
 const parseLine = (fileName: string, line: string, lineNr: number): Signature | null => {
@@ -59,7 +63,8 @@ const parseLine = (fileName: string, line: string, lineNr: number): Signature | 
   return {
     fileName: fileName,
     lineNr: lineNr,
-    sigName: parseSigName(splits[0]),
+    sigName: splits[0],
+    sigNameCompact: compactSigName(splits[0]),
     sig: splits[1],
     source: splits.length < 3 ? undefined : splits[2],
     classInfo: splits.length < 5 ? undefined : parseClassInfo(splits[3], splits[4]),
