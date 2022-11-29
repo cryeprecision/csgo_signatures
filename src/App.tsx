@@ -101,12 +101,12 @@ const fetchAllResources = async (signal: AbortSignal, callback?: FetchCallback):
 const matchesSearch = (sig: Signature, search: string): boolean => {
   const search_ = search.toLowerCase()
   return (
-    sig.sigName.toLowerCase().includes(search) ||
-    sig.sig.toLowerCase().includes(search) ||
-    sig.fileName.toLowerCase().includes(search) ||
-    (sig.source !== undefined && sig.source.toLowerCase().includes(search)) ||
+    sig.sigName.toLowerCase().includes(search_) ||
+    sig.sig.toLowerCase().includes(search_) ||
+    sig.fileName.toLowerCase().includes(search_) ||
+    (sig.source !== undefined && sig.source.toLowerCase().includes(search_)) ||
     (sig.classInfo !== undefined &&
-      (sig.classInfo.name.toLowerCase().includes(search) || sig.classInfo.vTableIndex.toString().includes(search)))
+      (sig.classInfo.name.toLowerCase().includes(search_) || sig.classInfo.vTableIndex.toString().includes(search_)))
   )
 }
 
