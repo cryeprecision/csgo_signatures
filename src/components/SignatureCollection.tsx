@@ -1,8 +1,8 @@
 import { Theme } from '@emotion/react'
-import { Box, Collapse, IconButton, MenuItem, Pagination, Paper, Select, Stack, SxProps, Typography } from '@mui/material'
+import { Box, Button, Collapse, IconButton, MenuItem, Pagination, Paper, Select, Stack, SxProps, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import { memo, useEffect, useMemo, useState } from 'react'
-import { Signature } from '../types/types'
+import { ClassInfo, Signature } from '../types/types'
 import { ExpandMore, ExpandLess } from '@mui/icons-material'
 import * as Sig from './Signature'
 import { paging } from '../utility/paging'
@@ -14,15 +14,18 @@ type SignatureItemProps = {
   index: number
 }
 
-const arraysAreEqual = (lhs: { sigs: Signature[] }, rhs: { sigs: Signature[] }): boolean => {
-  if (lhs.sigs.length !== rhs.sigs.length) return false
-  for (let i = 0; i < lhs.sigs.length; i += 1) {
-    if (lhs.sigs[i].lineNr !== rhs.sigs[i].lineNr || lhs.sigs[i].fileName !== rhs.sigs[i].fileName) return false
-  }
-  return true
+const classInfosAreEqual = (lhs: ClassInfo | undefined, rhs: ClassInfo | undefined): boolean => {
+  if (lhs !== undefined && rhs !== undefined) return lhs.nameCompact === rhs.nameCompact
+  return (lhs === undefined) === (rhs == undefined)
 }
-const sigsAreEqual = (lhs: SignatureItemProps, rhs: SignatureItemProps): boolean => {
-  return lhs.sig.lineNr === rhs.sig.lineNr && lhs.sig.fileName == rhs.sig.fileName
+
+const sigsAreEqual = (lhs: Signature, rhs: Signature): boolean => {
+  if (lhs.lineNr !== rhs.lineNr || lhs.fileName !== rhs.fileName || lhs.sigName !== rhs.sigName) return false
+  return classInfosAreEqual(lhs.classInfo, rhs.classInfo)
+}
+
+const sigPropsAreEqual = (lhs: SignatureItemProps, rhs: SignatureItemProps): boolean => {
+  return sigsAreEqual(lhs.sig, rhs.sig)
 }
 
 const signatureItemSx: SxProps<Theme> = {
@@ -31,28 +34,42 @@ const signatureItemSx: SxProps<Theme> = {
 
 const SignatureItem_ = ({ sig, index }: SignatureItemProps): JSX.Element => {
   return (
-    <Paper elevation={2} sx={signatureItemSx}>
-      <Box sx={{ display: 'flex', mb: 1, justifyContent: 'space-between', columnGap: 1 }}>
-        <Sig.MySignatureName sig={sig} />
-        <Box sx={{ display: 'flex', columnGap: 1 }}>
-          <Sig.MySource sig={sig} />
-          <Sig.MyFileName sig={sig} />
+    <Button
+      sx={{
+        display: 'block',
+        textTransform: 'none',
+        borderColor: 'transparent',
+        px: 1,
+        m: 0,
+        ':hover': {
+          backgroundColor: 'transparent',
+        },
+      }}
+      variant='outlined'
+    >
+      <Paper sx={{ p: 1 }}>
+        <Box sx={{ display: 'flex', mb: 1, justifyContent: 'space-between', columnGap: 1 }}>
+          <Sig.MySignatureName sig={sig} />
+          <Box sx={{ display: 'flex', columnGap: 1 }}>
+            <Sig.MySource sig={sig} />
+            <Sig.MyFileName sig={sig} />
+          </Box>
         </Box>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: 1 }}>
-        <Sig.MySignature sig={sig} />
-        <Sig.MyClassInfo sig={sig} />
-      </Box>
-    </Paper>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: 1 }}>
+          <Sig.MySignature sig={sig} />
+          <Sig.MyClassInfo sig={sig} />
+        </Box>
+      </Paper>
+    </Button>
   )
 }
-const SignatureItem = memo(SignatureItem_, sigsAreEqual)
+const SignatureItem = memo(SignatureItem_, sigPropsAreEqual)
 
 const pageSizes: number[] = [5, 10, 25, 50, 100]
 
 const ActualCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   return (
-    <Stack sx={{ my: 1 }} gap={1}>
+    <Stack sx={{ my: 1 }} gap={0}>
       {sigs.map((sig, index) => (
         <SignatureItem sig={sig} index={index} key={index} />
       ))}
