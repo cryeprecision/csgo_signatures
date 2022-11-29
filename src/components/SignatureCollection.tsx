@@ -1,13 +1,8 @@
-import { Theme } from '@emotion/react'
-import { Box, Button, Collapse, IconButton, MenuItem, Pagination, Paper, Select, Stack, SxProps, Typography } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { Box, ButtonBase, MenuItem, Pagination, Paper, Select, Stack } from '@mui/material'
+import { memo, useState } from 'react'
 import { ClassInfo, Signature } from '../types/types'
-import { ExpandMore, ExpandLess } from '@mui/icons-material'
 import * as Sig from './Signature'
 import { paging } from '../utility/paging'
-
-type SetOpen = React.Dispatch<React.SetStateAction<boolean[]>>
 
 type SignatureItemProps = {
   sig: Signature
@@ -28,26 +23,10 @@ const sigPropsAreEqual = (lhs: SignatureItemProps, rhs: SignatureItemProps): boo
   return sigsAreEqual(lhs.sig, rhs.sig)
 }
 
-const signatureItemSx: SxProps<Theme> = {
-  p: 1,
-}
-
 const SignatureItem_ = ({ sig, index }: SignatureItemProps): JSX.Element => {
   return (
-    <Button
-      sx={{
-        display: 'block',
-        textTransform: 'none',
-        borderColor: 'transparent',
-        px: 1,
-        m: 0,
-        ':hover': {
-          backgroundColor: 'transparent',
-        },
-      }}
-      variant='outlined'
-    >
-      <Paper sx={{ p: 1 }}>
+    <ButtonBase sx={{ display: 'block' }} onClick={({ target }) => console.log(target, sig, index)}>
+      <Paper elevation={4} sx={{ p: 1 }}>
         <Box sx={{ display: 'flex', mb: 1, justifyContent: 'space-between', columnGap: 1 }}>
           <Sig.MySignatureName sig={sig} />
           <Box sx={{ display: 'flex', columnGap: 1 }}>
@@ -60,7 +39,7 @@ const SignatureItem_ = ({ sig, index }: SignatureItemProps): JSX.Element => {
           <Sig.MyClassInfo sig={sig} />
         </Box>
       </Paper>
-    </Button>
+    </ButtonBase>
   )
 }
 const SignatureItem = memo(SignatureItem_, sigPropsAreEqual)
@@ -69,7 +48,7 @@ const pageSizes: number[] = [5, 10, 25, 50, 100]
 
 const ActualCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   return (
-    <Stack sx={{ my: 1 }} gap={0}>
+    <Stack sx={{ my: 1 }} gap={1}>
       {sigs.map((sig, index) => (
         <SignatureItem sig={sig} index={index} key={index} />
       ))}
