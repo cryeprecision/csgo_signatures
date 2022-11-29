@@ -50,7 +50,7 @@ const MyTooltip = ({ title, children }: { title: string; children: JSX.Element }
 }
 
 export const MySignatureName = ({ sig }: { sig: Signature }): JSX.Element => {
-  const text = sig.sigName
+  const text = sig.sigNameCompact ?? sig.sigName
   return (
     <MyTooltip title={text}>
       <MyTypography sx={nameSx} title={text} />
@@ -75,7 +75,7 @@ export const MyFileName = ({ sig }: { sig: Signature }): JSX.Element => {
 }
 export const MyClassInfo = ({ sig }: { sig: Signature }): JSX.Element | null => {
   if (sig.classInfo === undefined) return null
-  const text = `${sig.classInfo.name}[${sig.classInfo.vTableIndex}]`
+  const text = `${sig.classInfo.nameCompact ?? sig.classInfo.name}[${sig.classInfo.vTableIndex}]`
   return (
     <MyTooltip title={text}>
       <MyTypography sx={classInfoSx} title={text} />
