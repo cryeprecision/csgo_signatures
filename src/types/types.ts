@@ -1,24 +1,24 @@
 export type Resource = {
-  name: string
-  urlSuffix: string
+  readonly name: string
+  readonly urlSuffix: string
 }
 
 export type FetchCallback = (name: string, index: number) => void
 
 export type ClassInfo = {
-  name: string
-  nameCompact?: string
-  vTableIndex: number
+  readonly name: string
+  readonly nameCompact?: string
+  readonly vTableIndex: number
 }
 
 export type Signature = {
-  fileName: string
-  lineNr: number
-  sigName: string
-  sigNameCompact?: string
-  sig: string
-  source?: string
-  classInfo?: ClassInfo
+  readonly fileName: string
+  readonly lineNr: number
+  readonly sigName: string
+  readonly sigNameCompact?: string
+  readonly sig: string
+  readonly source?: string
+  readonly classInfo?: ClassInfo
 }
 
 export type RawResourceMap = { [key: string]: string }

@@ -3,24 +3,24 @@ export const configSuffix = 'config.json'
 export const offsetsSuffix = 'csgo.json'
 
 export type Signature = {
-  name: string
-  extra: number
-  relative: boolean
-  module: string
-  offsets: number[]
-  pattern: string
+  readonly name: string
+  readonly extra: number
+  readonly relative: boolean
+  readonly module: string
+  readonly offsets: number[]
+  readonly pattern: string
 }
 
 export type NetVar = {
-  name: string
-  prop: string
-  offset?: number
-  table: string
+  readonly name: string
+  readonly prop: string
+  readonly offset?: number
+  readonly table: string
 }
 
 export type Config = {
-  executable: string
-  filename: string
-  signatures: Signature[]
-  netvars: NetVar[]
+  readonly executable: string
+  readonly filename: string
+  readonly signatures: Signature[]
+  readonly netvars: NetVar[]
 }
