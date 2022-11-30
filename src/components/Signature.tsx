@@ -1,4 +1,5 @@
-import { styled, SxProps, TextField, Theme, Tooltip, Typography } from '@mui/material'
+import { Box, styled, SxProps, TextField, TextFieldProps, Theme, Tooltip, Typography } from '@mui/material'
+import { fontFamily } from '@mui/system'
 import { Signature } from '../types/types'
 
 const baseSx: SxProps<Theme> = {
@@ -8,13 +9,9 @@ const baseSx: SxProps<Theme> = {
 }
 const nameSx: SxProps<Theme> = {
   ...baseSx,
-  maxWidth: '70%',
-  textOverflow: 'ellipsis',
 }
 const sigSx: SxProps<Theme> = {
   ...baseSx,
-  maxWidth: '70%',
-  textOverflow: 'ellipsis',
   color: theme => theme.palette.info[theme.palette.mode],
 }
 const fileNameSx: SxProps<Theme> = {
@@ -23,8 +20,6 @@ const fileNameSx: SxProps<Theme> = {
 }
 const classInfoSx: SxProps<Theme> = {
   ...baseSx,
-  maxWidth: '70%',
-  textOverflow: 'ellipsis',
   color: theme => theme.palette.warning[theme.palette.mode],
 }
 const sourceSx: SxProps<Theme> = {
@@ -32,16 +27,16 @@ const sourceSx: SxProps<Theme> = {
   color: theme => theme.palette.success[theme.palette.mode],
 }
 
-const MyTypography = ({ sx, title }: { sx: SxProps<Theme>; title: string }): JSX.Element => {
+export const MyTypography = ({ sx, title, noWrap }: { sx?: SxProps<Theme>; title: string; noWrap?: boolean }): JSX.Element => {
   return (
-    <Typography noWrap fontFamily='Roboto Mono' sx={sx}>
+    <Typography noWrap={noWrap ?? true} fontFamily='Roboto Mono' sx={sx}>
       {title}
     </Typography>
   )
 }
 
-const MyTextField = ({ title }: { sx: SxProps<Theme>; title: string }): JSX.Element => {
-  return <TextField variant='outlined' size='small' value={title} inputMode='none' disabled />
+export const MyTextField = (props: TextFieldProps): JSX.Element => {
+  return <TextField {...props} variant='outlined' size='small' disabled inputProps={{ sx: { fontFamily: 'Roboto Mono' } }} />
 }
 
 const MyTooltip = ({ title, children }: { title: string; children: JSX.Element }): JSX.Element | null => {
@@ -77,9 +72,11 @@ export const MyClassInfo = ({ sig }: { sig: Signature }): JSX.Element | null => 
   if (sig.classInfo === undefined) return null
   const text = `${sig.classInfo.nameCompact ?? sig.classInfo.name}[${sig.classInfo.vTableIndex}]`
   return (
-    <MyTooltip title={text}>
-      <MyTypography sx={classInfoSx} title={text} />
-    </MyTooltip>
+    <Box>
+      <MyTooltip title={text}>
+        <MyTypography sx={classInfoSx} title={text} />
+      </MyTooltip>
+    </Box>
   )
 }
 export const MySource = ({ sig }: { sig: Signature }): JSX.Element | null => {
