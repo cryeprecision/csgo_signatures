@@ -16,8 +16,8 @@ const theme = createTheme({
   },
 })
 
-const urlPrefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
-// const urlPrefix = './real_resources/'
+// const urlPrefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
+const urlPrefix = './real_resources/'
 // const urlPrefix = './test_resources/'
 
 const resources: Resource[] = [
