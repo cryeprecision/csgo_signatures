@@ -22,19 +22,3 @@ export type Signature = {
 }
 
 export type RawResourceMap = { [key: string]: string }
-
-// export const toFileSignatures = (map: ResourceMap): FileSignature[] => {
-//   let buffer: FileSignature[] = []
-//   for (const [name, sigs] of Object.entries(map)) {
-//     buffer.push(
-//       ...sigs.map(sig => ({
-//         file: name,
-//         name: sig.name,
-//         sig: sig.sig,
-//         source: sig.source,
-//         classInfo: sig.classInfo,
-//       })),
-//     )
-//   }
-//   return buffer
-// }

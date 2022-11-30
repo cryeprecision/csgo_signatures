@@ -1,7 +1,6 @@
-import { Theme } from '@emotion/react'
-import { Accordion, AccordionDetails, AccordionSummary, Box, MenuItem, Pagination, Paper, Select, Stack, Typography } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2'
-import { memo, useMemo, useState } from 'react'
+import { Box, MenuItem, Pagination, Paper, Select, Stack, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import { memo, useState } from 'react'
 import { Signature } from '../types/types'
 import { paging } from '../utility/paging'
 

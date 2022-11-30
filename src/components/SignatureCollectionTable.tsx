@@ -1,10 +1,8 @@
-import { Theme } from '@emotion/react'
 import styled from '@emotion/styled'
-import { Accordion, AccordionDetails, AccordionSummary, Box, Chip as Chip_, Paper, Stack, Typography } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { Paper } from '@mui/material'
+import { DataGrid, GridColDef, DataGridProps } from '@mui/x-data-grid'
 import { memo, useMemo } from 'react'
-import { Signature, ClassInfo } from '../types/types'
+import { Signature } from '../types/types'
 
 type DataSignature = {
   file: string
@@ -15,7 +13,7 @@ type DataSignature = {
   vTableIndex: string
 }
 
-const StyledDataGrid = styled(DataGrid)(({ theme: Theme }) => ({
+const StyledDataGrid = styled((props: DataGridProps) => <DataGrid {...props} />)(() => ({
   '& .MuiDataGrid-iconSeparator': {
     display: 'none',
   },
@@ -79,37 +77,11 @@ const buildData = (sigs: Signature[]): DataSignature[] => {
 
 const getId = (sig: DataSignature): string => sig.file + sig.name
 
-export type SignatureItemProps = {
-  file: string
-  sig: Signature
-}
-
-const SignatureItem_ = ({ sig, file }: SignatureItemProps): JSX.Element => {
-  return (
-    <Accordion>
-      <AccordionSummary>
-        <Typography fontFamily='Roboto Mono'>{sig.sigName}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Box>
-          <Typography fontFamily='Roboto Mono' align='left' noWrap fontSize={10}>
-            {`${file}.dll -> ${sig.sig}`}
-          </Typography>
-          {sig.classInfo && <Typography fontFamily='Roboto Mono'>{`${sig.classInfo.name}[${sig.classInfo.vTableIndex}]`}</Typography>}
-          {sig.source && <Typography fontFamily='Roboto Mono'>{sig.source}</Typography>}
-        </Box>
-      </AccordionDetails>
-    </Accordion>
-  )
-}
-
-const SignatureItem = memo(SignatureItem_)
-
 const SignatureCollection_ = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   const dataSigs = useMemo((): DataSignature[] => buildData(sigs), [sigs])
   return (
     <Paper elevation={2} sx={{ height: '60vh', m: 2 }}>
-      <DataGrid columns={columns} rows={dataSigs} getRowId={getId} />
+      <StyledDataGrid columns={columns} rows={dataSigs} getRowId={getId} />
     </Paper>
   )
 }

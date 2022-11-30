@@ -1,14 +1,12 @@
 import './App.css'
 import '@fontsource/roboto-mono'
-import { memo, useEffect, useMemo, useState } from 'react'
-import { createTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import styled from '@emotion/styled'
+import { useEffect, useMemo, useState } from 'react'
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import { ClassInfo, FetchCallback, RawResourceMap, Resource, Signature } from './types/types'
 
 import { AppBar } from './components/AppBar'
 import { SignatureCollection } from './components/SignatureCollection'
-import { BracketPair, omitBrackets } from './utility/omit_templates'
+import { omitBrackets } from './utility/omit_templates'
 
 const theme = createTheme({
   palette: {
@@ -73,7 +71,7 @@ const parseLine = (fileName: string, line: string, lineNr: number): Signature | 
 }
 
 const parseFile = (fileName: string, file: string): Signature[] => {
-  let signatures: Signature[] = []
+  const signatures: Signature[] = []
   file.split('\n').forEach((line, index) => {
     const parsed = parseLine(fileName, line, index)
     if (parsed !== null) signatures.push(parsed)
@@ -88,7 +86,7 @@ const fetchResource = async (resource: Resource, signal: AbortSignal): Promise<s
 }
 
 const fetchAllResources = async (signal: AbortSignal, callback?: FetchCallback): Promise<RawResourceMap> => {
-  let data: RawResourceMap = {}
+  const data: RawResourceMap = {}
   const files = await Promise.all(
     resources.map((resource, index) =>
       fetchResource(resource, signal).then((file): [string, string] => {
@@ -141,7 +139,7 @@ export const App = () => {
 
   const parsedData = useMemo((): Signature[] => {
     if (rawData === undefined) return []
-    let buffer: Signature[] = []
+    const buffer: Signature[] = []
     for (const name of Object.keys(rawData)) {
       buffer.push(...parseFile(name, rawData[name]))
     }

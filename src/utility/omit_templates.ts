@@ -11,7 +11,7 @@ const findFirstBracket = (text: string, brackets: BracketPair, offset?: number):
   return null
 }
 const findAllBrackets = (text: string, brackets: BracketPair, offset?: number): BracketAt[] => {
-  let buffer: BracketAt[] = []
+  const buffer: BracketAt[] = []
   for (let i = offset ?? 0; i < text.length; i += 1) {
     if (text[i] === brackets[0]) buffer.push({ br: brackets[0], at: i })
     else if (text[i] === brackets[1]) buffer.push({ br: brackets[1], at: i })
@@ -20,8 +20,8 @@ const findAllBrackets = (text: string, brackets: BracketPair, offset?: number): 
 }
 
 const balancedBrackets = (text: string, brackets: BracketPair): number => {
-  let depth: number = 0
-  let offset: number = 0
+  let depth = 0
+  let offset = 0
   for (let i = 0; i < 100; i += 1) {
     const next = findFirstBracket(text, brackets, offset)
     if (next === null) break
@@ -54,9 +54,9 @@ export const omitBrackets = (
 
   const allBrackets = findAllBrackets(text, brackets)
 
-  let start: number = -1
-  let depth: number = 0
-  let offset: number = 0
+  let start = -1
+  let depth = 0
+  let offset = 0
 
   for (const bracket of allBrackets) {
     if (bracket.br === brackets[0]) depth += 1

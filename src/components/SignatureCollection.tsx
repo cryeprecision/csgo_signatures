@@ -1,4 +1,4 @@
-import { Box, IconButton, MenuItem, Pagination, Paper, Select, Stack, styled, SxProps, Theme, useMediaQuery } from '@mui/material'
+import { Box, IconButton, MenuItem, Pagination, Paper, Select, Stack, styled, Theme, useMediaQuery } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionDetailsProps, AccordionProps, AccordionSummary, AccordionSummaryProps } from '@mui/material'
 import { memo, useEffect, useState } from 'react'
 import { ContentCopy } from '@mui/icons-material'
@@ -30,16 +30,16 @@ const sigPropsAreEqual = (lhs: SignatureItemProps, rhs: SignatureItemProps): boo
   return lhs.open === rhs.open && sigsAreEqual(lhs.sig, rhs.sig)
 }
 
-const StyledAccordion = styled((props: AccordionProps) => <Accordion disableGutters={true} elevation={0} {...props} />)(({ theme }) => ({
+const StyledAccordion = styled((props: AccordionProps) => <Accordion disableGutters={true} elevation={0} {...props} />)(() => ({
   backgroundColor: 'transparent',
   ':before': { display: 'none' },
   '& .MuiAccordionSummary-content': { margin: 0, padding: 0 },
 }))
-const StyledAccordionSummary = styled((props: AccordionSummaryProps) => <AccordionSummary {...props} />)(({ theme }) => ({
+const StyledAccordionSummary = styled((props: AccordionSummaryProps) => <AccordionSummary {...props} />)(() => ({
   padding: 0,
   display: 'block',
 }))
-const StyledAccordionDetails = styled((props: AccordionDetailsProps) => <AccordionDetails {...props} />)(({ theme }) => ({
+const StyledAccordionDetails = styled((props: AccordionDetailsProps) => <AccordionDetails {...props} />)(() => ({
   padding: 0,
   display: 'block',
 }))
