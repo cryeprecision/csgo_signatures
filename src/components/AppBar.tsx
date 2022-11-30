@@ -1,7 +1,7 @@
-import { AppBar as AppBar_, IconButton, Toolbar, Typography, Box, TextField, Chip as Chip_, SxProps, InputAdornment } from '@mui/material'
+import { AppBar as AppBar_, Chip as Chip_ } from '@mui/material'
+import { IconButton, Toolbar, Typography, Box, TextField, InputAdornment } from '@mui/material'
+import { SxProps, useMediaQuery, Theme } from '@mui/material'
 import { Menu, Search, AccountCircle } from '@mui/icons-material'
-import styled from '@emotion/styled'
-import { Theme } from '@emotion/react'
 
 export type AppBarProps = {
   appState: string
@@ -15,19 +15,23 @@ const Chip = ({ sx, label }: { sx?: SxProps<Theme>; label?: React.ReactNode }): 
 }
 
 export const AppBar = ({ appState, sigsLoaded, sigsMatched, setSearch }: AppBarProps): JSX.Element => {
+  const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
+  const optional = reduced ? 'none' : undefined
+
   return (
     <AppBar_ position='sticky' sx={{ mb: 1 }}>
       <Toolbar>
-        <IconButton size='large' edge='start' sx={{ mr: 2 }}>
+        <IconButton size='large' edge='start' sx={{ mr: 2, display: optional }}>
           <Menu />
         </IconButton>
-        <Typography variant='h6' noWrap>
+        <Typography variant='h6' noWrap display={optional}>
           CS:GO Signatures
         </Typography>
         <TextField
           variant='outlined'
           sx={{ m: 2 }}
           size='small'
+          fullWidth={reduced}
           onChange={({ target }) => setSearch?.(target.value)}
           placeholder='Search'
           InputProps={{
@@ -41,9 +45,9 @@ export const AppBar = ({ appState, sigsLoaded, sigsMatched, setSearch }: AppBarP
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {sigsLoaded && <Chip label={`${sigsMatched ?? 0}/${sigsLoaded}`} />}
-        <Chip label={appState} />
-        <IconButton size='large' edge='end' sx={{ ml: 2 }}>
+        {sigsLoaded && <Chip sx={{ display: optional }} label={`${sigsMatched ?? 0}/${sigsLoaded}`} />}
+        <Chip sx={{ display: optional }} label={appState} />
+        <IconButton size='large' edge='end' sx={{ ml: 2, display: optional }}>
           <AccountCircle />
         </IconButton>
       </Toolbar>
