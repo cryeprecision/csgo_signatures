@@ -1,6 +1,6 @@
 import { Box, IconButton, MenuItem, Pagination, Paper, Select, Stack, styled, SxProps, Theme, useMediaQuery } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionDetailsProps, AccordionProps, AccordionSummary, AccordionSummaryProps } from '@mui/material'
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { ContentCopy } from '@mui/icons-material'
 
 import * as Sig from './Signature'
@@ -132,6 +132,8 @@ export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Elemen
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(-1)
+
+  useEffect(() => setOpen(-1), [sigs, page])
 
   const { pages, start, end } = paging(sigs.length, pageSize, page)
   const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
