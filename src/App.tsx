@@ -1,7 +1,7 @@
 import './App.css'
 import '@fontsource/roboto-mono'
 import { useEffect, useMemo, useState } from 'react'
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
+import { createTheme, CssBaseline, Stack, ThemeProvider } from '@mui/material'
 
 import { AppBar } from './components/AppBar'
 import { SignatureCollection } from './components/SignatureCollection'
@@ -64,6 +64,7 @@ export const App = () => {
         setError(error)
       })
       .finally(() => {
+        console.log(data)
         setLoading(false)
       })
 
@@ -81,9 +82,11 @@ export const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
       <AppBar appState={appState} sigsLoaded={sigCount} sigsMatched={filteredSigs.length} setSearch={setSearch} />
-      {data && <HazedumperConfig cfg={data.hazedumperConfig} />}
-      {data && <HazedumperOffsets offsets={data.hazedumperOffsets} />}
-      {filteredSigs && <SignatureCollection sigs={filteredSigs} />}
+      <Stack gap={4}>
+        {data && <HazedumperConfig cfg={data.hazedumperConfig} />}
+        {data && <HazedumperOffsets offsets={data.hazedumperOffsets} />}
+        {filteredSigs && <SignatureCollection sigs={filteredSigs} />}
+      </Stack>
     </ThemeProvider>
   )
 }

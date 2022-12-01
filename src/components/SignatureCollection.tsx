@@ -7,6 +7,7 @@ import * as Sig from './Signature'
 import * as Base from './Base'
 import { paging } from '../types/paging'
 import { ClassInfo, Signature } from '../types/types'
+import { Paging } from './Paging'
 
 type SetOpen = React.Dispatch<React.SetStateAction<number>>
 
@@ -140,29 +141,17 @@ export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Elemen
   const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
 
   return (
-    <Box sx={{ px: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
+    <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
       <Paper elevation={2}>
-        <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ p: 1 }}>
-          <Box sx={{ p: 1 }}>
-            <Pagination
-              size='large'
-              count={pages}
-              showFirstButton={!reduced}
-              showLastButton={!reduced}
-              siblingCount={reduced ? 0 : undefined}
-              onChange={(_event, page) => setPage(page)}
-            />
-          </Box>
-          <Box display={reduced ? 'none' : undefined}>
-            <Select value={pageSize} sx={{ minWidth: 100 }} onChange={({ target }) => setPageSize(target.value as number)}>
-              {pageSizes.map(size => (
-                <MenuItem key={size} value={size}>
-                  {size.toString()}
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
-        </Box>
+        <Paging
+          pages={pages}
+          size='large'
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          pageSizes={pageSizes}
+          setPage={setPage}
+          reduced={reduced}
+        />
       </Paper>
       <ActualCollection sigs={sigs.slice(start, end)} setOpen={setOpen} open={open} />
     </Box>

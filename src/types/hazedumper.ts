@@ -9,7 +9,7 @@ export type Signature = {
   readonly extra: number
   readonly relative: boolean
   readonly module: string
-  readonly offsets: number[]
+  readonly offsets?: number[]
   readonly pattern: string
 }
 
@@ -27,15 +27,29 @@ export type Config = {
   readonly netvars: NetVar[]
 }
 
+export type Offset = {
+  readonly name: string
+  readonly offset: number
+  readonly type: 'signature' | 'netvar'
+}
+
 export type Offsets = {
-  timestamp: number
-  signatures: Record<string, number>
-  netvars: Record<string, number>
+  readonly timestamp: number
+  readonly offsets: Offset[]
 }
 
 export const loadConfig = (signal?: AbortSignal): Promise<Config> => {
-  return Fetch.fetchOneJson(prefix + configSuffix, signal)
+  return Fetch.fetchOneJson<Config>(prefix + configSuffix, signal)
 }
-export const loadOffsets = (signal?: AbortSignal): Promise<Offsets> => {
-  return Fetch.fetchOneJson(prefix + offsetsSuffix, signal)
+export const loadOffsets = async (signal?: AbortSignal): Promise<Offsets> => {
+  type JsonType = { timestamp: number; signatures: Record<string, number>; netvars: Record<string, number> }
+  const json = await Fetch.fetchOneJson<JsonType>(prefix + offsetsSuffix, signal)
+
+  const netvars = Object.entries(json.netvars).map(([name, offset]): Offset => ({ name: name, offset: offset, type: 'netvar' }))
+  const sigs = Object.entries(json.signatures).map(([name, offset]): Offset => ({ name: name, offset: offset, type: 'signature' }))
+
+  return {
+    timestamp: json.timestamp,
+    offsets: netvars.concat(sigs),
+  }
 }
