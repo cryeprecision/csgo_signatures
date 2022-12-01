@@ -96,7 +96,7 @@ const fileNameFromUrl = (url: string): string => {
   return url.substring(url.lastIndexOf('/') + 1, url.length - 8)
 }
 
-export const loadSignatures = async (signal?: AbortSignal): Promise<Signature[]> => {
+export const loadSignaturesSite = async (signal?: AbortSignal): Promise<Signature[]> => {
   const urls = resources.map(suffix => prefix + suffix)
   const results = await Fetch.fetchAll(urls, signal)
   return results.reduce<Signature[]>((acc, next): Signature[] => {

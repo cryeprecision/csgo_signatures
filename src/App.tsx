@@ -6,7 +6,7 @@ import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import { AppBar } from './components/AppBar'
 import { SignatureCollection } from './components/SignatureCollection'
 import { Config, loadConfig, loadOffsets, Offsets } from './types/hazedumper'
-import { loadSignatures, Signature } from './types/kittenpopo'
+import { loadSignaturesSite, Signature } from './types/kittenpopo_site'
 import { HazedumperOffsets } from './components/HazedumperOffsets'
 import { HazedumperConfig } from './components/HazedumperConfig'
 
@@ -23,7 +23,7 @@ type Data = {
 }
 
 const fetchAllResources = async (signal: AbortSignal): Promise<Data> => {
-  const [config, offsets, signatures] = await Promise.all([loadConfig(signal), loadOffsets(signal), loadSignatures(signal)])
+  const [config, offsets, signatures] = await Promise.all([loadConfig(signal), loadOffsets(signal), loadSignaturesSite(signal)])
   return {
     hazedumperConfig: config,
     hazedumperOffsets: offsets,
@@ -64,7 +64,6 @@ export const App = () => {
         setError(error)
       })
       .finally(() => {
-        console.log(data)
         setLoading(false)
       })
 

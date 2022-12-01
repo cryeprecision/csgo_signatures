@@ -35,6 +35,9 @@ const shortenSigName = (name: string): string | undefined => {
 }
 
 const parseLine = (fileName: string, line: string, lineNr: number): Signature | null => {
+  // parse a single line within a namespace
+  // e.g. `ShadowMgr::Direction() = "55 8B EC 51";`
+
   const delim = line.indexOf('=')
   if (delim === -1 || line.indexOf('=', delim + 1) !== -1) return null
 
@@ -49,7 +52,7 @@ const parseLine = (fileName: string, line: string, lineNr: number): Signature | 
   const sig = line.substring(sigStart + 1, sigEnd).trim()
 
   return {
-    fileName: fileName,
+    fileName: fileName.replace('.dll', ''),
     lineNr: lineNr,
     sigName: sigName,
     sigNameShort: sigNameShort,
@@ -69,6 +72,9 @@ const parseNamespace = (fileName: string, data: string, lineOffset: number): Sig
 const parseFile = (data: string): Signature[] => {
   const sigs: Signature[] = []
 
+  // process each namespace individually
+  // namespaces start with `namespace "FILENAME.dll" {` and end with `}`
+
   let offset = 0
   for (;;) {
     const nameStart = data.indexOf('namespace "', offset)
@@ -83,7 +89,7 @@ const parseFile = (data: string): Signature[] => {
 
     const name = data.substring(nameStart + 11, nameEnd).toLowerCase()
     const content = data.substring(sigsStart + 1, sigsEnd).trim()
-    parseNamespace(name, content, offset)
+    sigs.push(...parseNamespace(name, content, offset))
 
     offset = sigsEnd + 1
   }
@@ -91,7 +97,7 @@ const parseFile = (data: string): Signature[] => {
   return sigs
 }
 
-export const loadSignatures = async (signal?: AbortSignal): Promise<Signature[]> => {
+export const loadSignaturesRepo = async (signal?: AbortSignal): Promise<Signature[]> => {
   const data = await Fetch.fetchOne(url, signal)
   return parseFile(data)
 }

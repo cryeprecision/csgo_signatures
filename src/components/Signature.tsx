@@ -1,5 +1,5 @@
 import { Box, SxProps, Theme } from '@mui/material'
-import { Signature } from '../types/kittenpopo'
+import { Signature } from '../types/kittenpopo_site'
 import { MyTooltip, MyTypography } from './Base'
 
 const baseSx: SxProps<Theme> = {
