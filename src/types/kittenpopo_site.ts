@@ -1,8 +1,8 @@
 import * as Fetch from './fetch'
 import { omitBrackets } from './omit_brackets'
 
-// const prefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
-const prefix = './real_resources/'
+const prefix = 'https://raw.githubusercontent.com/KittenPopo/csgo-offsets/site/rawsigdata/'
+// const prefix = './real_resources/'
 // const prefix = './test_resources/'
 
 const resources = [
