@@ -4,7 +4,8 @@ import { memo, useEffect, useState } from 'react'
 import { ContentCopy } from '@mui/icons-material'
 
 import * as Sig from './Signature'
-import { paging } from '../utility/paging'
+import * as Base from './Base'
+import { paging } from '../types/paging'
 import { ClassInfo, Signature } from '../types/types'
 
 type SetOpen = React.Dispatch<React.SetStateAction<number>>
@@ -100,7 +101,7 @@ const MyInfoElement = ({ value, title }: { value: string; title?: string }): JSX
       <IconButton sx={{ mr: 1, borderRadius: 1, border: '1px solid rgba(255, 255, 255, 0.2)' }} onClick={onClick}>
         <ContentCopy />
       </IconButton>
-      <Sig.MyTextField value={value} label={title} fullWidth />
+      <Base.MyTextField value={value} label={title} fullWidth />
     </Box>
   )
 }

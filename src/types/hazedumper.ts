@@ -1,3 +1,5 @@
+import * as Fetch from './fetch'
+
 export const prefix = 'https://raw.githubusercontent.com/frk1/hazedumper/master/'
 export const configSuffix = 'config.json'
 export const offsetsSuffix = 'csgo.json'
@@ -23,4 +25,17 @@ export type Config = {
   readonly filename: string
   readonly signatures: Signature[]
   readonly netvars: NetVar[]
+}
+
+export type Offsets = {
+  timestamp: number
+  signatures: Record<string, number>
+  netvars: Record<string, number>
+}
+
+export const loadConfig = (signal?: AbortSignal): Promise<Config> => {
+  return Fetch.fetchOneJson(prefix + configSuffix, signal)
+}
+export const loadOffsets = (signal?: AbortSignal): Promise<Offsets> => {
+  return Fetch.fetchOneJson(prefix + offsetsSuffix, signal)
 }

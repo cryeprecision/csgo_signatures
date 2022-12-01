@@ -20,5 +20,3 @@ export type Signature = {
   readonly source?: string
   readonly classInfo?: ClassInfo
 }
-
-export type RawResourceMap = { [key: string]: string }

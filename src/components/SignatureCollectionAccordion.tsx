@@ -2,7 +2,7 @@ import { Box, MenuItem, Pagination, Paper, Select, Stack, Typography } from '@mu
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import { memo, useState } from 'react'
 import { Signature } from '../types/types'
-import { paging } from '../utility/paging'
+import { paging } from '../types/paging'
 
 const SignatureItem = ({ sig }: { sig: Signature }): JSX.Element => {
   return (
@@ -25,7 +25,7 @@ const SignatureItem = ({ sig }: { sig: Signature }): JSX.Element => {
 
 const pageSizes: number[] = [5, 10, 25, 50, 100]
 
-const SignatureCollection_ = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
+export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
 
@@ -57,5 +57,3 @@ const SignatureCollection_ = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
     </>
   )
 }
-
-export const SignatureCollection = memo(SignatureCollection_)
