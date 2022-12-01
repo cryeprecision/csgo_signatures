@@ -1,8 +1,8 @@
-import styled from '@emotion/styled'
 import { Paper } from '@mui/material'
-import { DataGrid, GridColDef, DataGridProps } from '@mui/x-data-grid'
+import { GridColDef } from '@mui/x-data-grid'
 import { memo, useMemo } from 'react'
 import { Signature } from '../types/types'
+import { MyDataGrid } from './Base'
 
 type DataSignature = {
   file: string
@@ -12,12 +12,6 @@ type DataSignature = {
   className: string
   vTableIndex: string
 }
-
-const StyledDataGrid = styled((props: DataGridProps) => <DataGrid {...props} />)(() => ({
-  '& .MuiDataGrid-iconSeparator': {
-    display: 'none',
-  },
-}))
 
 const columns: GridColDef[] = [
   {
@@ -81,7 +75,7 @@ const SignatureCollection_ = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
   const dataSigs = useMemo((): DataSignature[] => buildData(sigs), [sigs])
   return (
     <Paper elevation={2} sx={{ height: '60vh', m: 2 }}>
-      <StyledDataGrid columns={columns} rows={dataSigs} getRowId={getId} />
+      <MyDataGrid columns={columns} rows={dataSigs} getRowId={getId} />
     </Paper>
   )
 }

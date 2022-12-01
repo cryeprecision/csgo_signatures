@@ -1,13 +1,12 @@
-import { Box, IconButton, MenuItem, Pagination, Paper, Select, Stack, styled, Theme, useMediaQuery } from '@mui/material'
-import { Accordion, AccordionDetails, AccordionDetailsProps, AccordionProps, AccordionSummary, AccordionSummaryProps } from '@mui/material'
+import { Box, IconButton, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
 import { memo, useEffect, useState } from 'react'
 import { ContentCopy } from '@mui/icons-material'
 
-import * as Sig from './Signature'
-import * as Base from './Base'
 import { paging } from '../types/paging'
 import { ClassInfo, Signature } from '../types/types'
 import { Paging } from './Paging'
+import { MyAccordion, MyAccordionSummary, MyAccordionDetails, MyTextField, MyTypography } from './Base'
+import { MySignatureName, MySource, MyFileName, MySignature, MyClassInfo } from './Signature'
 
 type SetOpen = React.Dispatch<React.SetStateAction<number>>
 
@@ -32,48 +31,28 @@ const sigPropsAreEqual = (lhs: SignatureItemProps, rhs: SignatureItemProps): boo
   return lhs.open === rhs.open && sigsAreEqual(lhs.sig, rhs.sig)
 }
 
-const StyledAccordion = styled((props: AccordionProps) => <Accordion disableGutters={true} elevation={0} {...props} />)(() => ({
-  backgroundColor: 'transparent',
-  ':before': { display: 'none' },
-  '& .MuiAccordionSummary-content': { margin: 0, padding: 0 },
-}))
-const StyledAccordionSummary = styled((props: AccordionSummaryProps) => <AccordionSummary {...props} />)(() => ({
-  padding: 0,
-  display: 'block',
-}))
-const StyledAccordionDetails = styled((props: AccordionDetailsProps) => <AccordionDetails {...props} />)(() => ({
-  padding: 0,
-  display: 'block',
-}))
-
 const SignatureItem_ = ({ sig, index, open, setOpen }: SignatureItemProps): JSX.Element => {
   return (
-    <Paper elevation={4} sx={{ p: 1 }}>
-      <StyledAccordion
-        TransitionProps={{ unmountOnExit: true }}
-        expanded={open}
-        onChange={(_event, newOpen) => setOpen(newOpen ? index : -1)}
-      >
-        <StyledAccordionSummary>
-          <Box sx={{ p: 0, width: '100%' }}>
-            <Box sx={{ display: 'flex', mb: 1, justifyContent: 'space-between', columnGap: 1 }}>
-              <Sig.MySignatureName sig={sig} />
-              <Box sx={{ display: 'flex', columnGap: 1 }}>
-                <Sig.MySource sig={sig} />
-                <Sig.MyFileName sig={sig} />
-              </Box>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: 1 }}>
-              <Sig.MySignature sig={sig} />
-              <Sig.MyClassInfo sig={sig} />
+    <MyAccordion elevation={3} expanded={open} onChange={(_event, newOpen) => setOpen(newOpen ? index : -1)}>
+      <MyAccordionSummary>
+        <Box sx={{ p: 0, width: '100%' }}>
+          <Box sx={{ display: 'flex', mb: 1, justifyContent: 'space-between', columnGap: 1 }}>
+            <MySignatureName sig={sig} />
+            <Box sx={{ display: 'flex', columnGap: 1 }}>
+              <MySource sig={sig} />
+              <MyFileName sig={sig} />
             </Box>
           </Box>
-        </StyledAccordionSummary>
-        <StyledAccordionDetails>
-          <MyModal sig={sig} />
-        </StyledAccordionDetails>
-      </StyledAccordion>
-    </Paper>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: 1 }}>
+            <MySignature sig={sig} />
+            <MyClassInfo sig={sig} />
+          </Box>
+        </Box>
+      </MyAccordionSummary>
+      <MyAccordionDetails>
+        <MyModal sig={sig} />
+      </MyAccordionDetails>
+    </MyAccordion>
   )
 }
 const SignatureItem = memo(SignatureItem_, sigPropsAreEqual)
@@ -102,7 +81,7 @@ const MyInfoElement = ({ value, title }: { value: string; title?: string }): JSX
       <IconButton sx={{ mr: 1, borderRadius: 1, border: '1px solid rgba(255, 255, 255, 0.2)' }} onClick={onClick}>
         <ContentCopy />
       </IconButton>
-      <Base.MyTextField value={value} label={title} fullWidth />
+      <MyTextField value={value} label={title} fullWidth />
     </Box>
   )
 }
@@ -142,18 +121,27 @@ export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Elemen
 
   return (
     <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
-      <Paper elevation={2}>
-        <Paging
-          pages={pages}
-          size='large'
-          pageSize={pageSize}
-          setPageSize={setPageSize}
-          pageSizes={pageSizes}
-          setPage={setPage}
-          reduced={reduced}
-        />
-      </Paper>
-      <ActualCollection sigs={sigs.slice(start, end)} setOpen={setOpen} open={open} />
+      <MyAccordion>
+        <MyAccordionSummary>
+          <Paper elevation={3} sx={{ p: 1, width: '100%' }}>
+            <MyTypography title='Kittenpopo Signatures' />
+          </Paper>
+        </MyAccordionSummary>
+        <MyAccordionDetails>
+          <Paper elevation={3}>
+            <Paging
+              pages={pages}
+              size='large'
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              pageSizes={pageSizes}
+              setPage={setPage}
+              reduced={reduced}
+            />
+          </Paper>
+          <ActualCollection sigs={sigs.slice(start, end)} setOpen={setOpen} open={open} />
+        </MyAccordionDetails>
+      </MyAccordion>
     </Box>
   )
 }

@@ -64,7 +64,6 @@ export const App = () => {
         setError(error)
       })
       .finally(() => {
-        console.log(data)
         setLoading(false)
       })
 
@@ -82,9 +81,9 @@ export const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
       <AppBar appState={appState} sigsLoaded={sigCount} sigsMatched={filteredSigs.length} setSearch={setSearch} />
-      <Stack gap={4}>
-        {data && <HazedumperConfig cfg={data.hazedumperConfig} />}
+      <Stack gap={1}>
         {data && <HazedumperOffsets offsets={data.hazedumperOffsets} />}
+        {data && <HazedumperConfig cfg={data.hazedumperConfig} />}
         {filteredSigs && <SignatureCollection sigs={filteredSigs} />}
       </Stack>
     </ThemeProvider>

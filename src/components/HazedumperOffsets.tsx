@@ -2,14 +2,14 @@ import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
 import { useState } from 'react'
 import { Offset, Offsets } from '../types/hazedumper'
 import { paging } from '../types/paging'
-import { MyTextField, MyTypography } from './Base'
 import { Paging } from './Paging'
 import Grid from '@mui/material/Unstable_Grid2'
+import { MyTextField, MyAccordion, MyAccordionSummary, MyTypography, MyAccordionDetails } from './Base'
 
 const HazedumperOffset = ({ offset }: { offset: Offset }): JSX.Element => {
   return (
     <Grid xs={2}>
-      <Paper elevation={4} sx={{ p: 1 }}>
+      <Paper elevation={5} sx={{ p: 1 }}>
         <MyTextField fullWidth label={offset.name} value={'0x' + offset.offset.toString(16).toUpperCase().padStart(8, '0')} />
       </Paper>
     </Grid>
@@ -28,27 +28,34 @@ export const HazedumperOffsets = ({ offsets }: { offsets: Offsets }): JSX.Elemen
 
   return (
     <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
-      <Stack gap={1}>
-        <Paper elevation={3} sx={{ p: 1 }}>
-          <MyTypography title={'Last Update: ' + title} />
-        </Paper>
-        <Paper elevation={3}>
-          <Paging
-            pages={pages}
-            size='large'
-            pageSize={pageSize}
-            setPageSize={setPageSize}
-            pageSizes={pageSizes}
-            setPage={setPage}
-            reduced={reduced}
-          />
-        </Paper>
-        <Grid container spacing={1}>
-          {offsets.offsets.slice(start, end).map(offset => (
-            <HazedumperOffset offset={offset} key={offset.name} />
-          ))}
-        </Grid>
-      </Stack>
+      <MyAccordion>
+        <MyAccordionSummary>
+          <Paper elevation={5} sx={{ p: 1, width: '100%', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <MyTypography title='Hazedumper Offsets' />
+            <MyTypography title={'Last Update: ' + title} />
+          </Paper>
+        </MyAccordionSummary>
+        <MyAccordionDetails>
+          <Stack gap={1}>
+            <Paper elevation={5}>
+              <Paging
+                pages={pages}
+                size='large'
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                pageSizes={pageSizes}
+                setPage={setPage}
+                reduced={reduced}
+              />
+            </Paper>
+            <Grid container spacing={1}>
+              {offsets.offsets.slice(start, end).map(offset => (
+                <HazedumperOffset offset={offset} key={offset.name} />
+              ))}
+            </Grid>
+          </Stack>
+        </MyAccordionDetails>
+      </MyAccordion>
     </Box>
   )
 }
