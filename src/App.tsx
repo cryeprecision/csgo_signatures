@@ -25,12 +25,14 @@ type Data = {
 }
 
 const fetchAllResources = async (signal: AbortSignal): Promise<Data> => {
+  console.time('fetchAllResources')
   const [config, offsets, sigsSite, sigsRepo] = await Promise.all([
     loadConfig(signal),
     loadOffsets(signal),
     loadSignaturesSite(signal),
     loadSignaturesRepo(),
   ])
+  console.timeEnd('fetchAllResources')
   return {
     hazedumperConfig: config,
     hazedumperOffsets: offsets,
