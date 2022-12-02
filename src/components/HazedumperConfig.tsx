@@ -4,7 +4,7 @@ import { Config, Signature, NetVar } from '../types/hazedumper'
 import { paging } from '../types/paging'
 import { Paging } from './Paging'
 import Grid from '@mui/material/Unstable_Grid2'
-import { MyTextField, MyAccordion, MyAccordionSummary, MyTypography, MyAccordionDetails } from './Base'
+import { MyTextField, MyAccordion, MyAccordionSummary, MyTypography, MyAccordionDetails, MyAccordionTitle } from './Base'
 
 const formatOffset = (offset: number | undefined): string => {
   return offset !== undefined ? '0x' + offset.toString(16).toUpperCase().padStart(2, '0') : ''
@@ -13,24 +13,36 @@ const formatOffsets = (offsets: number[]): string => {
   return offsets.map(formatOffset).join(' -> ')
 }
 
+const GridTextField = (props: { label: string; value: string }): JSX.Element => {
+  return (
+    <Grid xs={12} md={6}>
+      <MyTextField fullWidth {...props} />
+    </Grid>
+  )
+}
+
 const HazedumperConfigSignature = ({ sig }: { sig: Signature }): JSX.Element => {
   return (
-    <Paper elevation={4} sx={{ p: 1, display: 'flex', flexWrap: 'wrap', columnGap: 1 }}>
-      <MyTextField label='Pattern' value={sig.pattern} />
-      <MyTextField label='Module' value={sig.module} />
-      <MyTextField label='Name' value={sig.name} />
-      <MyTextField label='Offsets' value={formatOffsets(sig.offsets ?? [])} />
+    <Paper elevation={2} sx={{ p: 1 }}>
+      <Grid container spacing={1}>
+        <GridTextField label='Pattern' value={sig.pattern} />
+        <GridTextField label='Module' value={sig.module} />
+        <GridTextField label='Name' value={sig.name} />
+        <GridTextField label='Offsets' value={formatOffsets(sig.offsets ?? [])} />
+      </Grid>
     </Paper>
   )
 }
 
 const HazedumperConfigNetVar = ({ netVar }: { netVar: NetVar }): JSX.Element => {
   return (
-    <Paper elevation={4} sx={{ p: 1, display: 'flex', columnGap: 1 }}>
-      <MyTextField label='Name' value={netVar.name} />
-      <MyTextField label='Prop' value={netVar.prop} />
-      <MyTextField label='Table' value={netVar.table} />
-      <MyTextField label='Offset' value={formatOffset(netVar.offset)} />
+    <Paper elevation={2} sx={{ p: 1 }}>
+      <Grid container spacing={1}>
+        <GridTextField label='Name' value={netVar.name} />
+        <GridTextField label='Prop' value={netVar.prop} />
+        <GridTextField label='Table' value={netVar.table} />
+        <GridTextField label='Offset' value={formatOffset(netVar.offset)} />
+      </Grid>
     </Paper>
   )
 }
@@ -48,13 +60,13 @@ export const HazedumperConfig = ({ cfg }: { cfg: Config }): JSX.Element => {
     <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
       <MyAccordion>
         <MyAccordionSummary>
-          <Paper elevation={5} sx={{ p: 1, width: '100%' }}>
+          <MyAccordionTitle elevation={2}>
             <MyTypography title='Hazedumper Config' />
-          </Paper>
+          </MyAccordionTitle>
         </MyAccordionSummary>
         <MyAccordionDetails>
           <Stack gap={1}>
-            <Paper elevation={5}>
+            <Paper elevation={2}>
               <Paging
                 pages={pages}
                 size='large'

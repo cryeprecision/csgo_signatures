@@ -26,7 +26,7 @@ const SignatureItem = ({ sig }: { sig: Signature }): JSX.Element => {
 const pageSizes: number[] = [5, 10, 25, 50, 100]
 
 export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(pageSizes[1])
   const [page, setPage] = useState(1)
 
   const { pages, start, end } = paging(sigs.length, pageSize, page)

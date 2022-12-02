@@ -4,22 +4,22 @@ import { Offset, Offsets } from '../types/hazedumper'
 import { paging } from '../types/paging'
 import { Paging } from './Paging'
 import Grid from '@mui/material/Unstable_Grid2'
-import { MyTextField, MyAccordion, MyAccordionSummary, MyTypography, MyAccordionDetails } from './Base'
+import { MyTextField, MyAccordion, MyAccordionSummary, MyTypography, MyAccordionDetails, MyAccordionTitle } from './Base'
 
 const HazedumperOffset = ({ offset }: { offset: Offset }): JSX.Element => {
   return (
-    <Grid xs={2}>
-      <Paper elevation={5} sx={{ p: 1 }}>
+    <Grid xs={6} md={4} lg={3}>
+      <Paper elevation={2} sx={{ p: 1 }}>
         <MyTextField fullWidth label={offset.name} value={'0x' + offset.offset.toString(16).toUpperCase().padStart(8, '0')} />
       </Paper>
     </Grid>
   )
 }
 
-const pageSizes = [5, 10, 25, 50, 100]
+const pageSizes = [4, 12, 25, 50, 100]
 
 export const HazedumperOffsets = ({ offsets }: { offsets: Offsets }): JSX.Element => {
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(pageSizes[1])
   const [page, setPage] = useState(1)
 
   const { pages, start, end } = paging(offsets.offsets.length, pageSize, page)
@@ -30,14 +30,14 @@ export const HazedumperOffsets = ({ offsets }: { offsets: Offsets }): JSX.Elemen
     <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
       <MyAccordion>
         <MyAccordionSummary>
-          <Paper elevation={5} sx={{ p: 1, width: '100%', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <MyAccordionTitle elevation={2} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             <MyTypography title='Hazedumper Offsets' />
             <MyTypography title={'Last Update: ' + title} />
-          </Paper>
+          </MyAccordionTitle>
         </MyAccordionSummary>
         <MyAccordionDetails>
           <Stack gap={1}>
-            <Paper elevation={5}>
+            <Paper elevation={2}>
               <Paging
                 pages={pages}
                 size='large'

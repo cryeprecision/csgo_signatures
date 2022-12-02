@@ -5,7 +5,7 @@ import { ContentCopy } from '@mui/icons-material'
 import { paging } from '../types/paging'
 import { ClassInfo, Signature } from '../types/types'
 import { Paging } from './Paging'
-import { MyAccordion, MyAccordionSummary, MyAccordionDetails, MyTextField, MyTypography } from './Base'
+import { MyAccordion, MyAccordionSummary, MyAccordionDetails, MyTextField, MyTypography, MyAccordionTitle } from './Base'
 import { MySignatureName, MySource, MyFileName, MySignature, MyClassInfo } from './Signature'
 
 type SetOpen = React.Dispatch<React.SetStateAction<number>>
@@ -33,7 +33,7 @@ const sigPropsAreEqual = (lhs: SignatureItemProps, rhs: SignatureItemProps): boo
 
 const SignatureItem_ = ({ sig, index, open, setOpen }: SignatureItemProps): JSX.Element => {
   return (
-    <MyAccordion elevation={3} expanded={open} onChange={(_event, newOpen) => setOpen(newOpen ? index : -1)}>
+    <MyAccordion elevation={2} expanded={open} onChange={(_event, newOpen) => setOpen(newOpen ? index : -1)}>
       <MyAccordionSummary>
         <Box sx={{ p: 0, width: '100%' }}>
           <Box sx={{ display: 'flex', mb: 1, justifyContent: 'space-between', columnGap: 1 }}>
@@ -57,8 +57,6 @@ const SignatureItem_ = ({ sig, index, open, setOpen }: SignatureItemProps): JSX.
 }
 const SignatureItem = memo(SignatureItem_, sigPropsAreEqual)
 
-const pageSizes: number[] = [5, 10, 25, 50, 100]
-
 const ActualCollection = ({ sigs, open, setOpen }: { sigs: Signature[]; open: number; setOpen: SetOpen }): JSX.Element => {
   return (
     <Stack sx={{ my: 1 }} gap={1}>
@@ -69,29 +67,8 @@ const ActualCollection = ({ sigs, open, setOpen }: { sigs: Signature[]; open: nu
   )
 }
 
-const MyInfoElement = ({ value, title }: { value: string; title?: string }): JSX.Element => {
-  const onClick = () =>
-    navigator.clipboard
-      .writeText(value)
-      .then(() => alert('Copied to clipboard'))
-      .catch(err => alert("Couldn't copy to clipboard\n" + err))
-
-  return (
-    <Box display='flex'>
-      <IconButton sx={{ mr: 1, borderRadius: 1, border: '1px solid rgba(255, 255, 255, 0.2)' }} onClick={onClick}>
-        <ContentCopy />
-      </IconButton>
-      <MyTextField value={value} label={title} fullWidth />
-    </Box>
-  )
-}
-
 const MyModalInfo = ({ title, value }: { title: string; value: string }): JSX.Element => {
-  return (
-    <Stack gap={0.5}>
-      <MyInfoElement value={value} title={title} />
-    </Stack>
-  )
+  return <MyTextField value={value} label={title} fullWidth />
 }
 
 const MyModal = ({ sig }: { sig: Signature | null }): JSX.Element | null => {
@@ -109,8 +86,10 @@ const MyModal = ({ sig }: { sig: Signature | null }): JSX.Element | null => {
   )
 }
 
+const pageSizes: number[] = [5, 10, 25, 50, 100]
+
 export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(pageSizes[1])
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(-1)
 
@@ -123,12 +102,12 @@ export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Elemen
     <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
       <MyAccordion>
         <MyAccordionSummary>
-          <Paper elevation={3} sx={{ p: 1, width: '100%' }}>
+          <MyAccordionTitle elevation={2}>
             <MyTypography title='Kittenpopo Signatures' />
-          </Paper>
+          </MyAccordionTitle>
         </MyAccordionSummary>
         <MyAccordionDetails>
-          <Paper elevation={3}>
+          <Paper elevation={2}>
             <Paging
               pages={pages}
               size='large'
