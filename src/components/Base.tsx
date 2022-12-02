@@ -120,6 +120,7 @@ export const MyAccordionSummary = ({ sx, ...props }: AccordionSummaryProps) => (
   <AccordionSummary
     sx={{
       padding: 0,
+      display: 'block',
       ...sx,
     }}
     {...props}
