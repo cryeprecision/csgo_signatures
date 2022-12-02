@@ -1,6 +1,5 @@
-import { Box, IconButton, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
+import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
 import { memo, useEffect, useState } from 'react'
-import { ContentCopy } from '@mui/icons-material'
 
 import { paging } from '../types/paging'
 import { ClassInfo, Signature } from '../types/types'

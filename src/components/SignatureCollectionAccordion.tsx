@@ -1,6 +1,6 @@
 import { Box, MenuItem, Pagination, Paper, Select, Stack, Typography } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
-import { memo, useState } from 'react'
+import { useState } from 'react'
 import { Signature } from '../types/types'
 import { paging } from '../types/paging'
 

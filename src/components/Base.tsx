@@ -4,8 +4,9 @@ import { Accordion, AccordionDetails, AccordionDetailsProps, AccordionProps, Acc
 import { TypographyProps, TextFieldProps, TooltipProps } from '@mui/material'
 import { Typography, TextField, Tooltip } from '@mui/material'
 import { DataGrid, DataGridProps } from '@mui/x-data-grid'
-import { ContentCopy, ExpandMore } from '@mui/icons-material'
+import { ContentCopy } from '@mui/icons-material'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const paperBackground = (elevation: number): string => {
   const color = alpha('#fff', parseFloat(getOverlayAlpha(elevation)))
   return `linear-gradient(${color}, ${color})`
