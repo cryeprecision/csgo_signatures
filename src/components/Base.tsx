@@ -79,6 +79,7 @@ export const MyTextField = ({ value, sx, fullWidth, ...props }: TextFieldProps):
       InputLabelProps={{ shrink: true }}
       value={value}
       fullWidth={fullWidth}
+      sx={{ '& .MuiOutlinedInput-root': { height: '100%' } }}
       {...props}
     />
   </Stack>
