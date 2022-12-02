@@ -9,6 +9,8 @@ import { Config, loadConfig, loadOffsets, Offsets } from './types/hazedumper'
 import { loadSignaturesSite, Signature } from './types/kittenpopo_site'
 import { HazedumperOffsets } from './components/HazedumperOffsets'
 import { HazedumperConfig } from './components/HazedumperConfig'
+import { loadSignaturesRepo } from './types/kittenpopo_repo'
+import { mergeSignatures } from './types/kittenpopo_merge'
 
 const theme = createTheme({
   palette: {
@@ -23,11 +25,16 @@ type Data = {
 }
 
 const fetchAllResources = async (signal: AbortSignal): Promise<Data> => {
-  const [config, offsets, signatures] = await Promise.all([loadConfig(signal), loadOffsets(signal), loadSignaturesSite(signal)])
+  const [config, offsets, sigsSite, sigsRepo] = await Promise.all([
+    loadConfig(signal),
+    loadOffsets(signal),
+    loadSignaturesSite(signal),
+    loadSignaturesRepo(),
+  ])
   return {
     hazedumperConfig: config,
     hazedumperOffsets: offsets,
-    kittenpopoSignatures: signatures,
+    kittenpopoSignatures: mergeSignatures(sigsSite, sigsRepo),
   }
 }
 
