@@ -1,12 +1,12 @@
 import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { matchesSearchOffset, Offset, Offsets } from '../types/hazedumper'
 import { paging } from '../types/paging'
 import { Paging } from './Paging'
 import Grid from '@mui/material/Unstable_Grid2'
 import { MyTextField, MyAccordion, MyAccordionSummary, MyTypography, MyAccordionDetails, MyAccordionTitle } from './Base'
 
-const HazedumperOffset = ({ offset }: { offset: Offset }): JSX.Element => {
+const HazedumperOffset_ = ({ offset }: { offset: Offset }): JSX.Element => {
   return (
     <Grid xs={6} md={4} lg={3}>
       <Paper elevation={2} sx={{ p: 1 }}>
@@ -15,6 +15,7 @@ const HazedumperOffset = ({ offset }: { offset: Offset }): JSX.Element => {
     </Grid>
   )
 }
+const HazedumperOffset = memo(HazedumperOffset_)
 
 const pageSizes = [4, 12, 25, 50, 100]
 

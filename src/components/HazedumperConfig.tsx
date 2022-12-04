@@ -1,5 +1,5 @@
 import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { Config, Signature, NetVar, matchesSearchNetVar, matchesSearchSignature } from '../types/hazedumper'
 import { paging } from '../types/paging'
 import { Paging } from './Paging'
@@ -21,7 +21,7 @@ const GridTextField = (props: { label: string; value: string }): JSX.Element => 
   )
 }
 
-const HazedumperConfigSignature = ({ sig }: { sig: Signature }): JSX.Element => {
+const HazedumperConfigSignature_ = ({ sig }: { sig: Signature }): JSX.Element => {
   return (
     <Paper elevation={2} sx={{ p: 1 }}>
       <Grid container spacing={1}>
@@ -33,8 +33,9 @@ const HazedumperConfigSignature = ({ sig }: { sig: Signature }): JSX.Element => 
     </Paper>
   )
 }
+const HazedumperConfigSignature = memo(HazedumperConfigSignature_)
 
-const HazedumperConfigNetVar = ({ netVar }: { netVar: NetVar }): JSX.Element => {
+const HazedumperConfigNetVar_ = ({ netVar }: { netVar: NetVar }): JSX.Element => {
   return (
     <Paper elevation={2} sx={{ p: 1 }}>
       <Grid container spacing={1}>
@@ -46,6 +47,7 @@ const HazedumperConfigNetVar = ({ netVar }: { netVar: NetVar }): JSX.Element => 
     </Paper>
   )
 }
+const HazedumperConfigNetVar = memo(HazedumperConfigNetVar_)
 
 const pageSizes = [5, 10, 25, 50, 100]
 
