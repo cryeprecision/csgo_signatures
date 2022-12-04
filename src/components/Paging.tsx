@@ -12,7 +12,7 @@ export type PagingProps = {
 
 export const Paging = (props: PagingProps): JSX.Element => {
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ p: 1 }}>
+    <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ p: 0 }}>
       <Box sx={{ p: 1 }}>
         <Pagination
           size={props.size}
@@ -21,9 +21,10 @@ export const Paging = (props: PagingProps): JSX.Element => {
           showLastButton={!(props.reduced ?? false)}
           siblingCount={props.reduced ? 0 : 1}
           onChange={(_event, page) => props.setPage(page)}
+          sx={{ p: 1 }}
         />
       </Box>
-      <Box display={props.reduced ? 'none' : undefined}>
+      <Box display={props.reduced ? 'none' : undefined} sx={{ p: 1 }}>
         <Select value={props.pageSize} sx={{ minWidth: 100 }} onChange={({ target }) => props.setPageSize(target.value as number)}>
           {props.pageSizes.map(size => (
             <MenuItem key={size} value={size}>

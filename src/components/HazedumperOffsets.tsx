@@ -1,6 +1,6 @@
 import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
-import { useState } from 'react'
-import { Offset, Offsets } from '../types/hazedumper'
+import { useMemo, useState } from 'react'
+import { matchesSearchOffset, Offset, Offsets } from '../types/hazedumper'
 import { paging } from '../types/paging'
 import { Paging } from './Paging'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -18,11 +18,16 @@ const HazedumperOffset = ({ offset }: { offset: Offset }): JSX.Element => {
 
 const pageSizes = [4, 12, 25, 50, 100]
 
-export const HazedumperOffsets = ({ offsets }: { offsets: Offsets }): JSX.Element => {
+export const HazedumperOffsets = ({ offsets, search }: { offsets: Offsets; search: string }): JSX.Element => {
   const [pageSize, setPageSize] = useState(pageSizes[1])
   const [page, setPage] = useState(1)
 
-  const { pages, start, end } = paging(offsets.offsets.length, pageSize, page)
+  const filteredOffsets = useMemo(() => {
+    const search_ = search.toLowerCase()
+    return offsets.offsets.filter(offset => matchesSearchOffset(offset, search_))
+  }, [offsets, search])
+
+  const { pages, start, end } = paging(filteredOffsets.length, pageSize, page)
   const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
   const title = new Date(offsets.timestamp * 1000).toLocaleString()
 
@@ -49,7 +54,7 @@ export const HazedumperOffsets = ({ offsets }: { offsets: Offsets }): JSX.Elemen
               />
             </Paper>
             <Grid container spacing={1}>
-              {offsets.offsets.slice(start, end).map(offset => (
+              {filteredOffsets.slice(start, end).map(offset => (
                 <HazedumperOffset offset={offset} key={offset.name} />
               ))}
             </Grid>

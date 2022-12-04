@@ -1,6 +1,7 @@
 import './App.css'
 import '@fontsource/roboto-mono'
-import { useEffect, useMemo, useState } from 'react'
+
+import { useEffect, useState } from 'react'
 import { createTheme, CssBaseline, Stack, ThemeProvider } from '@mui/material'
 
 import { AppBar } from './components/AppBar'
@@ -30,27 +31,17 @@ const fetchAllResources = async (signal: AbortSignal): Promise<Data> => {
     loadConfig(signal),
     loadOffsets(signal),
     loadSignaturesSite(signal),
-    loadSignaturesRepo(),
+    loadSignaturesRepo(signal),
   ])
   console.timeEnd('fetchAllResources')
+
+  mergeSignatures(sigsSite, sigsRepo)
+
   return {
     hazedumperConfig: config,
     hazedumperOffsets: offsets,
-    kittenpopoSignatures: mergeSignatures(sigsSite, sigsRepo),
+    kittenpopoSignatures: sigsSite,
   }
-}
-
-const matchesSearch = (sig: Signature, search: string): boolean => {
-  if (search === '') return true
-  const search_ = search.toLowerCase()
-  return (
-    sig.sigName.toLowerCase().includes(search_) ||
-    sig.sig.toLowerCase().includes(search_) ||
-    sig.fileName.toLowerCase().includes(search_) ||
-    (sig.source !== undefined && sig.source.toLowerCase().includes(search_)) ||
-    (sig.classInfo !== undefined &&
-      (sig.classInfo.name.toLowerCase().includes(search_) || sig.classInfo.vTableIndex.toString().includes(search_)))
-  )
 }
 
 export const App = () => {
@@ -79,21 +70,16 @@ export const App = () => {
     return () => controller.abort()
   }, [])
 
-  const filteredSigs = useMemo((): Signature[] => {
-    return (data?.kittenpopoSignatures ?? []).filter(sig => matchesSearch(sig, search))
-  }, [search, data])
-
-  const sigCount = data?.kittenpopoSignatures.length ?? 0
   const appState = loading ? 'Loading' : error ? 'Error: ' + error.message : data ? 'Done' : 'Undefined'
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <AppBar appState={appState} sigsLoaded={sigCount} sigsMatched={filteredSigs.length} setSearch={setSearch} />
+      <AppBar appState={appState} setSearch={setSearch} />
       <Stack gap={1}>
-        {data && <HazedumperOffsets offsets={data.hazedumperOffsets} />}
-        {data && <HazedumperConfig cfg={data.hazedumperConfig} />}
-        {filteredSigs && <SignatureCollection sigs={filteredSigs} />}
+        {data && <SignatureCollection sigs={data.kittenpopoSignatures} search={search} />}
+        {data && <HazedumperConfig cfg={data.hazedumperConfig} search={search} />}
+        {data && <HazedumperOffsets offsets={data.hazedumperOffsets} search={search} />}
       </Stack>
     </ThemeProvider>
   )

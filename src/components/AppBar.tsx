@@ -5,8 +5,6 @@ import { Menu, Search, AccountCircle } from '@mui/icons-material'
 
 export type AppBarProps = {
   appState: string
-  sigsLoaded?: number
-  sigsMatched?: number
   setSearch?: React.Dispatch<React.SetStateAction<string>>
 }
 
@@ -14,7 +12,7 @@ const Chip = ({ sx, label }: { sx?: SxProps<Theme>; label?: React.ReactNode }): 
   return <Chip_ sx={{ ml: 1, ...sx }} label={label} />
 }
 
-export const AppBar = ({ appState, sigsLoaded, sigsMatched, setSearch }: AppBarProps): JSX.Element => {
+export const AppBar = ({ appState, setSearch }: AppBarProps): JSX.Element => {
   const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
   const optional = reduced ? 'none' : undefined
 
@@ -45,7 +43,6 @@ export const AppBar = ({ appState, sigsLoaded, sigsMatched, setSearch }: AppBarP
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {sigsLoaded && <Chip sx={{ display: optional }} label={`${sigsMatched ?? 0}/${sigsLoaded}`} />}
         <Chip sx={{ display: optional }} label={appState} />
         <IconButton size='large' edge='end' sx={{ ml: 2, display: optional }}>
           <AccountCircle />

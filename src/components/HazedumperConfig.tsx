@@ -1,6 +1,6 @@
 import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
-import { useState } from 'react'
-import { Config, Signature, NetVar } from '../types/hazedumper'
+import { useMemo, useState } from 'react'
+import { Config, Signature, NetVar, matchesSearchNetVar, matchesSearchSignature } from '../types/hazedumper'
 import { paging } from '../types/paging'
 import { Paging } from './Paging'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -49,12 +49,20 @@ const HazedumperConfigNetVar = ({ netVar }: { netVar: NetVar }): JSX.Element => 
 
 const pageSizes = [5, 10, 25, 50, 100]
 
-export const HazedumperConfig = ({ cfg }: { cfg: Config }): JSX.Element => {
+export const HazedumperConfig = ({ cfg, search }: { cfg: Config; search: string }): JSX.Element => {
   const [pageSize, setPageSize] = useState(pageSizes[0])
   const [page, setPage] = useState(1)
-
-  const { pages, start, end } = paging(Math.max(cfg.netvars.length, cfg.signatures.length), pageSize, page)
   const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
+
+  const [filteredNetVars, filteredSigs] = useMemo(() => {
+    const search_ = search.toLowerCase()
+    return [
+      cfg.netvars.filter(netVar => matchesSearchNetVar(netVar, search_)),
+      cfg.signatures.filter(sig => matchesSearchSignature(sig, search_)),
+    ]
+  }, [cfg, search])
+
+  const { pages, start, end } = paging(Math.max(filteredNetVars.length, filteredSigs.length), pageSize, page)
 
   return (
     <Box sx={{ mx: { xs: 1, md: 2, lg: 8, xl: 32 } }}>
@@ -81,14 +89,14 @@ export const HazedumperConfig = ({ cfg }: { cfg: Config }): JSX.Element => {
             <Grid container spacing={1}>
               <Grid xs={6}>
                 <Stack gap={1}>
-                  {cfg.netvars.slice(start, end).map(netVar => (
+                  {filteredNetVars.slice(start, end).map(netVar => (
                     <HazedumperConfigNetVar netVar={netVar} key={netVar.name} />
                   ))}
                 </Stack>
               </Grid>
               <Grid xs={6}>
                 <Stack gap={1}>
-                  {cfg.signatures.slice(start, end).map(sig => (
+                  {filteredSigs.slice(start, end).map(sig => (
                     <HazedumperConfigSignature sig={sig} key={sig.name} />
                   ))}
                 </Stack>

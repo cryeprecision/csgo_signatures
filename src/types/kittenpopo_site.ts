@@ -30,6 +30,18 @@ export type Signature = {
   readonly classInfo?: ClassInfo
 }
 
+export const matchesSearchSignature = (sig: Signature, search: string): boolean => {
+  if (search === '') return true
+  return (
+    sig.sigName.toLowerCase().includes(search) ||
+    sig.sig.toLowerCase().includes(search) ||
+    sig.fileName.toLowerCase().includes(search) ||
+    (sig.source !== undefined && sig.source.toLowerCase().includes(search)) ||
+    (sig.classInfo !== undefined &&
+      (sig.classInfo.name.toLowerCase().includes(search) || sig.classInfo.vTableIndex.toString().includes(search)))
+  )
+}
+
 const omitLongTemplates = (text: string): string | null => {
   return omitBrackets(text, ['<', '>'], 1, '[...]', 10)
 }

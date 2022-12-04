@@ -1,11 +1,12 @@
 import { Box, Paper, Stack, Theme, useMediaQuery } from '@mui/material'
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 
 import { paging } from '../types/paging'
 import { ClassInfo, Signature } from '../types/types'
 import { Paging } from './Paging'
 import { MyAccordion, MyAccordionSummary, MyAccordionDetails, MyTextField, MyTypography, MyAccordionTitle } from './Base'
 import { MySignatureName, MySource, MyFileName, MySignature, MyClassInfo } from './Signature'
+import { matchesSearchSignature } from '../types/kittenpopo_site'
 
 type SetOpen = React.Dispatch<React.SetStateAction<number>>
 
@@ -87,14 +88,19 @@ const MyModal = ({ sig }: { sig: Signature | null }): JSX.Element | null => {
 
 const pageSizes: number[] = [5, 10, 25, 50, 100]
 
-export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Element => {
-  const [pageSize, setPageSize] = useState(pageSizes[1])
+export const SignatureCollection = ({ sigs, search }: { sigs: Signature[]; search: string }): JSX.Element => {
+  const [pageSize, setPageSize] = useState(pageSizes[0])
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(-1)
 
-  useEffect(() => setOpen(-1), [sigs, page])
+  const filteredSigs = useMemo(() => {
+    const search_ = search.toLowerCase()
+    return sigs.filter(sig => matchesSearchSignature(sig, search_))
+  }, [sigs, search])
 
-  const { pages, start, end } = paging(sigs.length, pageSize, page)
+  useEffect(() => setOpen(-1), [filteredSigs, page])
+
+  const { pages, start, end } = paging(filteredSigs.length, pageSize, page)
   const reduced = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
 
   return (
@@ -117,7 +123,7 @@ export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Elemen
               reduced={reduced}
             />
           </Paper>
-          <ActualCollection sigs={sigs.slice(start, end)} setOpen={setOpen} open={open} />
+          <ActualCollection sigs={filteredSigs.slice(start, end)} setOpen={setOpen} open={open} />
         </MyAccordionDetails>
       </MyAccordion>
     </Box>

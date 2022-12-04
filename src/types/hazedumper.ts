@@ -1,3 +1,4 @@
+import { compareStrings } from './compare'
 import * as Fetch from './fetch'
 
 export const prefix = 'https://raw.githubusercontent.com/frk1/hazedumper/master/'
@@ -38,18 +39,47 @@ export type Offsets = {
   readonly offsets: Offset[]
 }
 
-export const loadConfig = (signal?: AbortSignal): Promise<Config> => {
-  return Fetch.fetchOneJson<Config>(prefix + configSuffix, signal)
+export const matchesSearchOffset = (offset: Offset, search: string): boolean => {
+  if (search === '') return true
+  return offset.name.toLowerCase().includes(search)
 }
+
+export const matchesSearchNetVar = (netVar: NetVar, search: string): boolean => {
+  if (search === '') return true
+  return (
+    netVar.name.toLowerCase().includes(search) || netVar.prop.toLowerCase().includes(search) || netVar.table.toLowerCase().includes(search)
+  )
+}
+
+export const matchesSearchSignature = (sig: Signature, search: string): boolean => {
+  if (search === '') return true
+  return sig.name.toLowerCase().includes(search) || sig.module.toLowerCase().includes(search)
+}
+
+export const loadConfig = async (signal?: AbortSignal): Promise<Config> => {
+  const result = await Fetch.fetchOneJson<Config>(prefix + configSuffix, signal)
+  result.netvars.sort((lhs, rhs) => {
+    const cmp = compareStrings(lhs.table, rhs.table)
+    return cmp !== 0 ? cmp : compareStrings(lhs.name, rhs.name)
+  })
+  result.signatures.sort((lhs, rhs) => {
+    const cmp = compareStrings(lhs.module, rhs.module)
+    return cmp !== 0 ? cmp : compareStrings(lhs.name, rhs.name)
+  })
+  return result
+}
+
 export const loadOffsets = async (signal?: AbortSignal): Promise<Offsets> => {
   type JsonType = { timestamp: number; signatures: Record<string, number>; netvars: Record<string, number> }
   const json = await Fetch.fetchOneJson<JsonType>(prefix + offsetsSuffix, signal)
 
   const netvars = Object.entries(json.netvars).map(([name, offset]): Offset => ({ name: name, offset: offset, type: 'netvar' }))
   const sigs = Object.entries(json.signatures).map(([name, offset]): Offset => ({ name: name, offset: offset, type: 'signature' }))
+  const all = netvars.concat(sigs)
+  all.sort((lhs, rhs) => compareStrings(lhs.name, rhs.name))
 
   return {
     timestamp: json.timestamp,
-    offsets: netvars.concat(sigs),
+    offsets: all,
   }
 }
