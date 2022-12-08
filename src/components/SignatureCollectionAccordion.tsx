@@ -50,8 +50,8 @@ export const SignatureCollection = ({ sigs }: { sigs: Signature[] }): JSX.Elemen
         </Box>
       </Paper>
       <Stack sx={{ mb: 2, mx: 2 }}>
-        {sigs.slice(start, end).map(sig => (
-          <SignatureItem sig={sig} />
+        {sigs.slice(start, end).map((sig, index) => (
+          <SignatureItem sig={sig} key={index} />
         ))}
       </Stack>
     </>
